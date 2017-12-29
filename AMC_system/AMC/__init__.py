@@ -12,7 +12,7 @@ def create_app():
     app.config.from_object('config')
 
     # Create modules
-#    app.register_blueprint(customerModule)
+    app.register_blueprint(customerModule)
     app.register_blueprint(adminModule)
     
     
