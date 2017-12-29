@@ -1,0 +1,152 @@
+
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+	<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>Login for AMC</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+  
+
+  	<!-- Facebook and Twitter integration -->
+	<meta property="og:title" content=""/>
+	<meta property="og:image" content=""/>
+	<meta property="og:url" content=""/>
+	<meta property="og:site_name" content=""/>
+	<meta property="og:description" content=""/>
+	<meta name="twitter:title" content="" />
+	<meta name="twitter:image" content="" />
+	<meta name="twitter:url" content="" />
+	<meta name="twitter:card" content="" />
+
+	<!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+	<link rel="shortcut icon" href="favicon.ico">
+
+	<link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700,300' rel='stylesheet' type='text/css'>
+	
+	<link rel="stylesheet" href="../../static/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../static/css/animate.css">
+	<link rel="stylesheet" href="../../static/css/login-style.css">
+
+	<!-- Modernizr JS -->
+	<script src="../../static/js/modernizr-2.6.2.min.js"></script>
+	<!-- FOR IE9 below -->
+	<!--[if lt IE 9]>
+	<script src="js/respond.min.js"></script>
+	<![endif]-->
+	
+	<script type="text/javascript">
+	      var _gaq = _gaq || [];
+	      _gaq.push(['_setAccount', 'UA-146052-10']);
+	      _gaq.push(['_trackPageview']);
+	      (function() {
+	        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+	        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+	        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	      })();
+	</script>
+
+
+	<SCRIPT type="text/javascript">
+
+	 function toueme(){
+	  var user=document.getElementById("username").value;
+	  var para=document.getElementById("password").value;
+	 	console.log(user);
+	 	console.log(para);
+
+	    $.ajax({   
+	              type:"POST",  
+	              url:"/sysadmin/login",
+	              dataType: "json",
+	              async:false,
+	              data:{
+	                para : para,
+	                user : user
+	              },
+	              success: function(data){
+	              		console.log(data);
+	 
+	                      if(data=='Right') {
+	                      			window.open("index")
+	                              } 
+	                      else{
+	                          if (data=='Wrong_pass') {
+	                                alert("密码错误!");
+	                            }
+	                          else
+	                          {
+	                              alert("用户名错误!");
+	                          }
+	                      } 
+	                          
+	                    }
+	               
+	    });
+	  }
+	  
+	 function re_home(){
+	    window.location.href="/login/";
+	  }
+
+	</SCRIPT>
+
+	</head>
+	<body class="style-3">
+
+		<div class="container">
+			<div class="row">
+				<div class="col-md-1" style="margin-top: 15%">
+					<img src="../../static/images/amc_logo_big.png" width="600" style="margin-left: 18%">
+				</div>
+
+				<div class="col-md-4 col-md-push-7" style="margin-top: 5%">
+
+					<!-- Start Sign In Form -->
+					<form action="#" class="fh5co-form animate-box" data-animate-effect="fadeInRight">
+						<h2 >登 陆</h2>
+						<div class="form-group">
+							<label for="username" class="sr-only">用户名</label>
+							<input type="text" class="form-control" id="username" placeholder="Username" autocomplete="off">
+						</div>
+						<div class="form-group">
+							<label for="password" class="sr-only">密码</label>
+							<input type="password" class="form-control" id="password" placeholder="Password" autocomplete="off">
+						</div>
+						<div class="form-group">
+							<label for="remember"><input type="checkbox" id="remember"> 记住我</label>
+						</div>
+						<div class="form-group">
+							<input type="submit" value="Sign In" class="btn btn-primary" onClick="toueme()">
+						</div>
+					</form>
+					<!-- END Sign In Form -->
+
+
+				</div>
+			</div>
+		</div>
+
+	
+	<script src="../../static/js/admin/jquery-1.9.1.min.js"></script>
+	
+	<!-- Bootstrap -->
+	<script src="../../static/js/bootstrap.min.js"></script>
+	<!-- Placeholder -->
+	<script src="../../static/js/jquery.placeholder.min.js"></script>
+	<!-- Waypoints -->
+	<script src="../../static/js/jquery.waypoints.min.js"></script>
+	<!-- Main JS -->
+	<script src="../../static/js/login-main.js"></script>
+<!-- 	<script src="../../static/js/chart.min.js"></script>
+	<script src="../../static/js/chart-data.js"></script>
+	<script src="../../static/js/easypiechart.js"></script>
+	<script src="../../static/js/easypiechart-data.js"></script>
+	<script src="../../static/js/bootstrap-datepicker.js"></script> -->
+
+	</body>
+</html>
+

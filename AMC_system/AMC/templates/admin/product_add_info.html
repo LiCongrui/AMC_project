@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>产品信息填写</title>
+<style type="text/css">
+<!--
+body { margin: 0px;padding: 0px;text-align: left;}
+TD {FONT-SIZE: 12px; COLOR: #333;}
+#daohang {BORDER-BOTTOM: #e2e2e2 1px solid;}
+
+
+-->
+</style>
+<script src="/static/js/admin/jquery-1.9.1.min.js" type="text/javascript"></script>
+<script type="text/javascript" src="/static/js/admin/bootstrap.js"></script>
+<script type="text/javascript" src="/static/js/admin/bootstrap.min.js"></script>
+<script type="text/javascript" src="/static/js/admin/bootstrap-fileupload.js"></script>
+<script type="text/javascript" src="/static/js/admin/bootstrap-fileupload.min.js"></script>
+<link href="/static/css/admin/bootstrap.css" rel="stylesheet">
+<link href="/static/css/admin/bootstrap-responsive.css" rel="stylesheet">
+<link href="/static/css/admin/bootstrap.min.css" rel="stylesheet">
+<link href="/static/css/admin/bootstrap-responsive.min.css" rel="stylesheet">
+<link href="/static/css/admin/bootstrap-fileupload.css" rel="stylesheet">
+<link href="/static/css/admin/bootstrap-fileupload.min.css" rel="stylesheet">
+<style type="text/css" media="all">
+ul{  
+    list-style-type:none;  
+    width:100%;
+    padding: 0px;
+    margin:0px;  
+  }  
+  
+  </style>
+ <style type="text/css">
+  .onecity1{
+    color:#FF0000;
+
+  }
+  .onecity2{
+    color:black;
+  }
+  
+    </style>
+<SCRIPT type="text/javascript">
+
+ function save_product(){
+  var product_id=document.getElementById("product_id").value;
+  var product_name=document.getElementById("product_name").value;
+  var sale_price=document.getElementById("sale_price").value;
+  var product_format=document.getElementById("product_format").value;
+  var product_image=document.getElementById("product_image").value;
+  var product_introduction=document.getElementById("product_introduction").value;
+  if((product_id)&&(product_name)&&(sale_price)&&(product_introduction)&&(product_format)&&(product_image)){
+    $.ajax({   
+              type:"POST",  
+              url:"/sysadmin/add_product",
+              dataType: "json",
+              async:false,
+              data:{
+                product_id : product_id,
+                product_name : product_name,
+                sale_price : sale_price,
+                product_format : product_format,
+                product_image : product_image,
+                product_introduction : product_introduction
+              },
+              success: function(data){
+ 
+                      if(data=='Right') {
+                          alert("添加成功!");
+                          window.open("/sysadmin/products/");
+                      } 
+                      else {
+                        alert("该产品已存在!");
+                      }
+              }
+               
+    });
+  }
+  else{
+    alert("您有未填写的信息！");
+  }  
+  }
+
+</SCRIPT>
+</head>
+
+<body>
+<div style="background:#000000;">
+  <div style="background:#000000;">
+    <img src="/static/img/logos/logo2.png" alt="" style="padding-left:200px;"/>
+  </div>
+</div>
+
+        <div class="tab-pane active" align="center" style="padding-top:50px;">
+          <p style="font-size:20pt;color:#0000FF;">请填写产品信息</p>
+          <table style="padding-top:50px;">
+            <tbody>
+              <tr style="padding-top:20px;">
+                <td width="35%" height="50" style="font-size: 16pt" align="center">产品代码 </td>
+                <td width="65%"  colspan="2" >
+                 <input type="text"  id="product_id" class="logininput" name="usercode"    size="30"  datatype="Require" style="width: 180px; height:19px; border:1px solid #5397be;"  msg="请输入产品代码"/>
+                </td>
+              </tr>
+              <tr style="padding-top:20px;">
+                <td width="35%" height="50" style="font-size: 16pt" align="center">产品名称 </td>
+                <td width="65%"  colspan="2" >
+                 <input type="text"  id="product_name" class="logininput" name="usercode"    size="30"  datatype="Require" style="width: 180px; height:19px; border:1px solid #5397be;"  msg="请输入产品名称"/>
+                </td>
+              </tr>
+              <tr style="padding-top:20px;">
+                <td width="35%" height="50" style="font-size: 16pt" align="center">产品售价 </td>
+                <td width="65%"  colspan="2" >
+                 <input type="text"  id="sale_price" class="logininput" name="usercode"    size="30"  datatype="Require" style="width: 180px; height:19px; border:1px solid #5397be;"  msg="请输入产品售价"/>
+                </td>
+              </tr>
+              <tr style="padding-top:20px;">
+                <td width="35%" height="50" style="font-size: 16pt" align="center">产品规格 </td>
+                <td width="65%"  colspan="2" >
+                 <input type="text"  id="product_format" class="logininput" name="usercode"    size="30"  datatype="Require" style="width: 180px; height:19px; border:1px solid #5397be;"  msg="请输入产品规格"/>
+                </td>
+              </tr>
+              <tr style="padding-top:20px;">
+                <td width="35%" height="50" style="font-size: 16pt" align="center">图片链接 </td>
+                <td width="65%"  colspan="2" >
+                 <input type="text"  id="product_image" class="logininput" name="usercode"    size="30"  datatype="Require" style="width: 180px; height:19px; border:1px solid #5397be;"  msg="请输入图片链接"/>
+                </td>
+              </tr>
+              <tr style="padding-top:20px;">
+                <td width="35%" height="50" style="font-size: 16pt" align="center">产品简介 </td>  
+                <td width="65%"  colspan="2" >
+                 <textarea type="text"  id="product_introduction" class="logininput" name="usercode"    size="30"  datatype="Require" style="width: 180px; height:70px; border:1px solid #5397be;"  maxlength='140' msg="请输入产品简介"></textarea>
+                </td>              
+              </tr>
+              <tr>
+                <td colspan="3" style="padding-left:300px;padding-top: 35px">
+                  <input type="button" value="保存"  style="width: 90px; height: 30px; background:#0489B1; font-size: 20px;border:#0489B1" onClick="save_product()"/>
+                </td>
+             </tr>
+            </tdoby>
+          </table>
+        </div>
+</body>
