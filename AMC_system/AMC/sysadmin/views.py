@@ -788,7 +788,6 @@ def noDeliver_orders_rank():
                     break
 
                 if newword.sale_order_status in ("已提交".decode('utf-8'),"部分发货".decode('utf-8')):
-                    print "scdsaicgsiucgiudcdycgsiycvysvcii"
                     news.append({'sale_order_number':newword.sale_order_number,'customer_id':newword.customer_id,'sale_order_total_price':newword.sale_order_total_price,'sale_order_status':newword.sale_order_status.encode('utf-8'),'sale_order_create_time':newword.sale_order_create_time})
     total_pages = limit / countperpage + 1
     return json.dumps({'news': news, 'pages': total_pages},cls=ComplexEncoder)
@@ -836,6 +835,8 @@ def noDeliver_order_detail_rank():
     return json.dumps({'news': news, 'pages': total_pages})
 
 
+
+##发货管理 / 待发货订单详情  发货确认按钮
 @mod.route('/deliver_confirm/') ##发货确认
 def deliver_confirm():
     if request.args.get('sale_order_number'):
@@ -862,15 +863,17 @@ def deliver_confirm():
             db.session.delete(old_item)
             db.session.commit()
             
-        new_item = sale_order_detail(sale_order_number,sale_order_item_number, product_id, sale_amount,sale_price,sale_item_status)
+        new_item = sale_order_detail(sale_order_number,sale_order_item_number, product_id, sale_amount,sale_price,total_price_this_item,sale_item_status)
         db.session.add(new_item)
         db.session.commit()
 
         #return json.dumps('Right')
         right_flag = 1
+        print "aaa",right_flag
     else:        
         #return json.dumps('Wrong')
         right_flag = 0
+        print "bbb",right_flag
 
 
     ###修改sale_order_summary订单状态的几种情况
@@ -882,7 +885,7 @@ def deliver_confirm():
 
     #订单条目的几种状态：未提交、已提交、已发货、已收货
     #订单的几种状态：未提交、已提交、部分发货、已发货、已收货、已付款       
-    if "已提交" in sale_item_status_list:
+    if "已提交".decode('utf-8') in sale_item_status_list:
         new_status = "部分发货"
     else:
         new_status = "已发货"    
@@ -910,9 +913,11 @@ def deliver_confirm():
 
         #return json.dumps('Right')
         right_flag = 1
+        print "ccc",right_flag
     else:        
         #return json.dumps('Wrong')
         right_flag = 0
+        print "ddd",right_flag
 
 
     ###发货后向 delivery_statistics 发货统计表中添加信息
@@ -922,18 +927,23 @@ def deliver_confirm():
             customer_address = old_item.customer_address
  
     delivery_quantity = sale_amount
-    deliver_time = datetime.datetime.now()
+    deliver_time = datetime.now()
+
+    ##发货备注，暂且不写
+    delivery_remarks = ""
 
     old_items = db.session.query(delivery_statistics).filter(delivery_statistics.sale_order_number==sale_order_number,delivery_statistics.sale_order_item_number==sale_order_item_number).all()
     if len(old_items):
         #return json.dumps('Wrong')
         right_flag = 0
+        print "eee",right_flag
     else:
-        new_item = delivery_statistics(sale_order_number,sale_order_item_number,product_id,delivery_quantity,customer_id,customer_address,deliver_time,delivery_operator)
+        new_item = delivery_statistics(sale_order_number,sale_order_item_number,product_id,delivery_quantity,customer_id,customer_address,deliver_time,delivery_operator, delivery_remarks)
         db.session.add(new_item)
         db.session.commit()
        #return json.dumps('Right')
         right_flag = 1
+        print "fff",right_flag
 
 
     ###发货后修改 stock_summary 库存表中对应产品的库存量信息
@@ -959,9 +969,12 @@ def deliver_confirm():
 
         #return json.dumps('Right')
         right_flag = 1
+        print "ggg",right_flag
     else:        
         #return json.dumps('Wrong')
+        print "stock_summary 未能正确修改，请检查库存表中是否有对应产品信息"
         right_flag = 0
+        print "hhh",right_flag
 
     if right_flag == 1:
         return json.dumps('Right')
@@ -998,4 +1011,4 @@ def delivery_statistics_rank():
 
                 news.append({'sale_order_number':newword.sale_order_number,'sale_order_item_number':newword.sale_order_item_number,'product_id':newword.product_id,'delivery_quantity':newword.delivery_quantity,'customer_id':newword.customer_id,'customer_address':newword.customer_address.encode('utf-8'),'deliver_time':newword.deliver_time,'delivery_operator':newword.delivery_operator.encode('utf-8'),'delivery_remarks':newword.delivery_remarks.encode('utf-8')})
     total_pages = limit / countperpage + 1
-    return json.dumps({'news': news, 'pages': total_pages})
+    return json.dumps({'news': news, 'pages': total_pages},cls=ComplexEncoder)

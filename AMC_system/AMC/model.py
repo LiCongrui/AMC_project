@@ -44,8 +44,8 @@ class stock_summary(db.Model):
 #1.6
 class delivery_statistics(db.Model):
     __tablename__ = 'delivery_statistics'
-    sales_order_number = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
-    sales_order_item_number = db.Column(db.Integer, nullable=False, primary_key=True)
+    sale_order_number = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
+    sale_order_item_number = db.Column(db.Integer, nullable=False, primary_key=True)
     product_id = db.Column(db.Integer, nullable=False)
     delivery_quantity = db.Column(db.Integer, nullable=False)
     customer_id = db.Column(db.Integer, nullable=False)
@@ -54,9 +54,9 @@ class delivery_statistics(db.Model):
     delivery_operator = db.Column(db.String(30), nullable=False)
     delivery_remarks = db.Column(db.String(30), nullable=False)
 
-    def __init__(self, sales_order_number, sales_order_item_number, product_id, delivery_quantity, customer_id, customer_address,deliver_time, delivery_operator,delivery_remarks):
-        self.sales_order_number = sales_order_number
-        self.sales_order_item_number = sales_order_item_number
+    def __init__(self, sale_order_number, sale_order_item_number, product_id, delivery_quantity, customer_id, customer_address,deliver_time, delivery_operator,delivery_remarks):
+        self.sale_order_number = sale_order_number
+        self.sale_order_item_number = sale_order_item_number
         self.product_id = product_id
         self.delivery_quantity = delivery_quantity
         self.customer_id = customer_id
