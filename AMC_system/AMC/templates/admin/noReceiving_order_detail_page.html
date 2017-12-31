@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AMC - Deliver Management</title>
+<title>AMC - Receiving Management</title>
 
 <!-- <script src="../../static/js/admin/jquery-3.2.1.min.js" type="text/javascript"></script> -->
 <script src="../../static/js/admin/jquery-1.9.1.min.js" type="text/javascript"></script>
@@ -129,7 +129,7 @@ function GetQueryString(name)
      var r = window.location.search.substr(1).match(reg);
      if(r!=null)return  unescape(r[2]); return null;
 }
-				
+		
 
 </script>
 
@@ -206,13 +206,13 @@ function GetQueryString(name)
 		<div class="row">
 			<ol class="breadcrumb">
 				<li><a href="#"><span class="glyphicon glyphicon-home"></span></a></li>
-				<li class="active">发货管理 / 待发货订单详情</li>
+				<li class="active">收货管理 / 待收货订单详情</li>
 			</ol>
 		</div><!--/.row-->
 		
 		<div class="row">
 			<div class="col-lg-12">
-				<h1 class="page-header">Customer Order Detail</h1>
+				<h1 class="page-header">Purchasing Order Detail</h1>
 			</div>
 		</div><!--/.row-->
 									
@@ -221,7 +221,7 @@ function GetQueryString(name)
 		<div class="row"><!--/.row1-->
 		  <div class="col-lg-12">
 		    <div class="panel panel-default">
-		      <div class="panel-heading">待发货订单详情</div>
+		      <div class="panel-heading">待收货订单详情</div>
 		  <div class="panel-body">
 		        
 		        <!--from paraset/car/-->
@@ -243,14 +243,14 @@ function GetQueryString(name)
 		                    <thead>
 		                      <tr> 
 		                        <th style="text-align:center;display:none;">序号</th>
-		                        <th style="text-align:center">订单编号</th>                       
-		                        <th style="text-align:center">条目编号</th>
+		                        <th style="text-align:center">采购订单编号</th>                       
+		                        <th style="text-align:center">采购条目编号</th>
 		                        <th style="text-align:center">产品代码</th>
-		                        <th style="text-align:center">销售量</th>
-		                        <th style="text-align:center">销售单价</th>                       
+		                        <th style="text-align:center">购买量</th>
+		                        <th style="text-align:center">采购价格</th>                       
 		                        <th style="text-align:center">本条目总价</th>
 		                        <th style="text-align:center">本条目状态</th>
-		                        <th style="text-align:center">确认发货</th>
+		                        <th style="text-align:center">确认收货</th>
 		                      </tr>
 		                    </thead>
 		                    <div id="users_area">
@@ -273,7 +273,7 @@ function GetQueryString(name)
 		                  function getRankData_f1(countperpage_args, limit_arg){
 		                      var total_page_number;
 		                      $.ajax({
-		                          url: "/sysadmin/noDeliver_order_detail_rank/?page=1&countperpage=" + countperpage_args + "&limit=" + limit_arg + '&sale_order_number=' + page_id,
+		                          url: "/sysadmin/noReceiving_order_detail_rank/?page=1&countperpage=" + countperpage_args + "&limit=" + limit_arg + '&purchase_order_number=' + page_id,
 		                          dataType: 'json',   
 		                          type: "GET",
 		                          success: function (data) {
@@ -282,19 +282,19 @@ function GetQueryString(name)
 		                            // var modal_content = "";
 		                            for(var i=0;i < data['news'].length;i += 1){
 		                                user = data['news'][i];
-		                                html += "<tr><td style='text-align:center;display:none;'>" + user['sale_order_number'] + "</td>";
-		                                html += "<td style='text-align:center'>" + user['sale_order_number'] + "</td>";
-		                                html += "<td style='text-align:center'>" + user['sale_order_item_number'] + "</td>";
+		                                html += "<tr><td style='text-align:center;display:none;'>" + user['purchase_order_number'] + "</td>";
+		                                html += "<td style='text-align:center'>" + user['purchase_order_number'] + "</td>";
+		                                html += "<td style='text-align:center'>" + user['purchase_order_item_number'] + "</td>";
 		                                html += "<td style='text-align:center'>" + user['product_id'] + "</td>";
-		                                html += "<td style='text-align:center'>" + user['sale_amount'] + "</td>";
-		                                html += "<td style='text-align:center'>" + user['sale_price'] + "</td>";
+		                                html += "<td style='text-align:center'>" + user['purchase_amount'] + "</td>";
+		                                html += "<td style='text-align:center'>" + user['purchase_price'] + "</td>";
 		                                html += "<td style='text-align:center'>" + user['total_price_this_item'] + "</td>";
-		                               html += "<td style='text-align:center'>" + user['sale_item_status'] + "</td>";
+		                               html += "<td style='text-align:center'>" + user['purchase_item_status'] + "</td>";
 		                               // 模态框btn
-		                               html += "<td  style='text-align:center'><button id='deliver_order_"+i+"' type='button' data-toggle='modal' data-target='#fahuoModal_"+i+"' style = 'background:#81DAF5'>"+"确认发货"+"</button></td></tr>";
+		                               html += "<td  style='text-align:center'><button id='receiving_order_"+i+"' type='button' data-toggle='modal' data-target='#shouhuoModal_"+i+"' style = 'background:#81DAF5'>"+"确认收货"+"</button></td></tr>";
 		                               //模态框 内容
 		                               modal_content = '\
-		                               <div class="modal fade" id="fahuoModal_'+i+'" tabindex="-1" role="dialog" aria-labelledby="myModalLabel_'+i+'" aria-hidden="true">\
+		                               <div class="modal fade" id="shouhuoModal_'+i+'" tabindex="-1" role="dialog" aria-labelledby="myModalLabel_'+i+'" aria-hidden="true">\
 		                               	<div class="modal-dialog">\
 		                               		<div class="modal-content">\
 		                               			<div class="modal-header">\
@@ -302,22 +302,22 @@ function GetQueryString(name)
 		                               					&times;\
 		                               				</button>\
 		                               				<h4 class="modal-title" id="myModalLabel_'+i+'">\
-		                               					确认发货\
+		                               					确认收货\
 		                               				</h4>\
 		                               			</div>\
 		                               			<div class="modal-body">\
-		                               				请输入发货员姓名: <input type="text" name="deliver_name" msg="请输入发货员姓名" id="deliver_opt_'+i+'">\
+		                               				请输入收货员姓名: <input type="text" name="receiving_name" msg="请输入收货员姓名" id="receiving_opt_'+i+'">\
 		                               			</div>\
 		                               			<div class="modal-footer">\
 		                               				<button type="button" class="btn btn-primary" onclick="(function(){\
-		                               						var opt=document.getElementById(\'deliver_opt_'+i+'\').value;\
+		                               						var opt=document.getElementById(\'receiving_opt_'+i+'\').value;\
 		                               						$.ajax({\
-		                               						    url: \'/sysadmin/deliver_confirm/?sale_order_number='+ user['sale_order_number']+'&sale_order_item_number= '+user['sale_order_item_number']+'&delivery_operator=\'+opt+\'\',\
+		                               						    url: \'/sysadmin/receiving_confirm/?purchase_order_number='+ user['purchase_order_number']+'&purchase_order_item_number= '+user['purchase_order_item_number']+'&receiving_operator=\'+opt+\'\',\
 		                               						    dataType: \'json\',   \
 		                               						    type: \'GET\',\
 		                               						    success: function (data) {\
 		                               						    	if(data == \'Right\'){\
-		                               						    		alert(\'发货成功!\');\
+		                               						    		alert(\'收货成功!\');\
 		                               						    		window.location.reload();\
 		                               						    	}\
 		                               						    }})\
@@ -342,21 +342,21 @@ function GetQueryString(name)
 		                            }).on("page", function(event, /* page number here */ num){
 		                            $("#word_table").empty();
 		                            $.ajax({
-		                                url: "/sysadmin/noDeliver_order_detail_rank/?page=" + num + "&countperpage=" + countperpage_args + "&limit=" + limit_arg,
+		                                url: "/sysadmin/noReceiving_order_detail_rank/?page=" + num + "&countperpage=" + countperpage_args + "&limit=" + limit_arg,
 		                                dataType: 'json',   
 		                                type: "GET",
 		                                success: function (data) {
 		                                  var html = "";
 		                                  for(var i=0;i < data['news'].length;i += 1){
 		                                    user = data['news'][i];
-		                                    html += "<tr><td style='text-align:center;display:none;'>" + user['sale_order_number'] + "</td>";
-		                                    html += "<td style='text-align:center'>" + user['sale_order_number'] + "</td>";
-		                                    html += "<td style='text-align:center'>" + user['sale_order_item_number'] + "</td>";
+		                                    html += "<tr><td style='text-align:center;display:none;'>" + user['purchase_order_number'] + "</td>";
+		                                    html += "<td style='text-align:center'>" + user['purchase_order_number'] + "</td>";
+		                                    html += "<td style='text-align:center'>" + user['purchase_order_item_number'] + "</td>";
 		                                    html += "<td style='text-align:center'>" + user['product_id'] + "</td>";
-		                                    html += "<td style='text-align:center'>" + user['sale_amount'] + "</td>";
-		                                    html += "<td style='text-align:center'>" + user['sale_price'] + "</td>";
+		                                    html += "<td style='text-align:center'>" + user['purchase_amount'] + "</td>";
+		                                    html += "<td style='text-align:center'>" + user['purchase_price'] + "</td>";
 		                                    html += "<td style='text-align:center'>" + user['total_price_this_item'] + "</td>";
-		                                    html += "<td style='text-align:center'>" + user['sale_item_status'] + "</td></tr>";
+		                                    html += "<td style='text-align:center'>" + user['purchase_item_status'] + "</td></tr>";
 		                                  }
 		                                  $("#word_table").append(html);
 		                                }

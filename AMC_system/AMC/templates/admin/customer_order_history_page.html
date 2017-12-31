@@ -184,21 +184,7 @@ function GetQueryString(name)
 		        2-->
 
 		        <div id="info" style="padding-left:50px;padding-top:0px;height:370px;width:900px;">
-		               <div id="manage" style="width:500px; height:70px;padding-left:25px;padding-top: 5px">
-		                    <div class="btn-group" >
-		                        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#" style="width: 60px;" onClick="drop_menu()">
-		                         选择
-		                        <span class="caret"></span>
-		                        </a>
-		                        <ul class="dropdown-menu" id="drop_f">
-		                    
-		                         <li><a href='#' onClick="declear_all()">全选</a></li>
-		                         <li><a href='#' onClick="declear_re()">反选</a></li>
-		                        </ul>
-		                    </div>
-		                 
-		                    <button id="de_order" type="button" class="btn btn-danger">删除订单</button>
-		               </div>
+		              
 		               <div class="bs-docs-example">
 		                  <table class="table table-bordered" id="new_table">
 		                    <thead>
@@ -290,39 +276,6 @@ function GetQueryString(name)
 		          getRankData_f1(countperpage_args, limit_arg);
 		        })
 		               
-		                /*删除*/
-		                $("#de_order").click(function() {
-		                    n = 0;
-		                    $("[name='field_f']").each(function(){                              
-		                        if(this.checked)
-		                        {
-		                              var fa = $(this).parent();
-		                              var ne = $(fa).prev().prev().prev().prev().prev().prev().prev();                   
-		                              var f_id = $(ne).html();
-		                              console.log(f_id);
-		                              $.ajax({   
-		                                type:"POST",  
-		                                url:"/sysadmin/orders_de",
-		                                dataType: "json",
-		                                async:false,
-		                                data:{f_id : f_id},
-		                                success: function(data){
-		                                    if( data =='Right'){
-		                                      n = n + 1;
-		                                    }
-		                                }           
-		                              });
-		                        }   
-		                    });
-		                    if(n > 0){
-		                            alert("删除成功！");
-		                          }
-		                    location.reload();
-		                          //document.getElementById("tab2").innerHTML=document.getElementById("tab2");
-		                });
-		               
-
-
 		                /*订单详情*/
 		                $("#order_detail").click(function() {
 		                  console.log("sssssssssssssssssssssssss")
