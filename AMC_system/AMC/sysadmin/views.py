@@ -1424,8 +1424,17 @@ def order_volume_automatic_mo():
         return json.dumps('Wrong')
 
 
+
+def nwefunc():
+    print hello
+
 ##################
 
 #########new try
 
 #########try 22222
+
+
+
+def afun():
+    print "ggggggggg"
