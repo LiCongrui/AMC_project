@@ -31,10 +31,11 @@ def ts2datetime(ts):
 
 @mod.route('/')
 @mod.route('/login/', methods=['GET','POST'])
-def index():
+def login():
     #return render_template('admin/index.html')
     result = None
     if 'logged_in' in session and session['logged_in']:
+        print "pop pop", session['logged_in'], session['user']
         session.pop('user', None)
         session.pop('logged_in', None)
     if request.method == 'POST':
@@ -45,6 +46,7 @@ def index():
                     result = 'Right'
             if result == 'Right':
                 session['logged_in'] = 'Ture'
+                print "SESSION POST ", session['logged_in']
                 session['user'] = request.form['user']
                 flash('登录成功！')
             else:
@@ -57,13 +59,14 @@ def index():
 @mod.route('/index/')
 def show_index():
     if 'logged_in' in session and session['logged_in']:
+        print "here index"
         return render_template('admin/index.html') 
     else:
         return redirect('/sysadmin/')
 
 @mod.route('/order/')
 def show_order():
-    print session
+    session['logged_in']
     if 'logged_in' in session and session['logged_in']:
         return render_template('admin/order.html') 
     else:
@@ -146,7 +149,9 @@ def orders_rank():
                 if n > endoffset:
                     break
 
-                news.append({'sale_order_number':newword.sale_order_number,'customer_id':newword.customer_id,'sale_order_total_price':newword.sale_order_total_price,'sale_order_status':newword.sale_order_status.encode('utf-8'),'sale_order_create_time':newword.sale_order_create_time})
+                # if newword.sale_order_status in ("未提交".decode('utf-8')) ：
+                if newword.sale_order_status != "未提交".decode('utf-8'):
+                    news.append({'sale_order_number':newword.sale_order_number,'customer_id':newword.customer_id,'sale_order_total_price':newword.sale_order_total_price,'sale_order_status':newword.sale_order_status.encode('utf-8'),'sale_order_create_time':newword.sale_order_create_time})
     total_pages = limit / countperpage + 1
     return json.dumps({'news': news, 'pages': total_pages},cls=ComplexEncoder)
 
@@ -530,25 +535,97 @@ def purchasing_de():
     return json.dumps(result)
 
 
-@mod.route('/purchasing_order_add_info/')#增加一条采购订单信息
-def purchasing_order_add_info():
-    return render_template('admin/purchasing_order_add_info.html')
+@mod.route('/purchasing_show_supplier/')#增加一条采购订单信息
+def purchasing_show_supplier():
+    return render_template('admin/purchasing_show_supplier.html')
 
 
-@mod.route('/add_purchasing_order', methods=['GET','POST'])#添加采购订单信息
-def add_purchasing_order():
-    supplier_id = request.form['supplier_id']
-    product_id = request.form['product_id']
-    purchase_price = request.form['purchase_price']
 
-    old_items = db.session.query(supplier_available_product).filter(supplier_available_product.product_id==product_id,supplier_available_product.supplier_id==supplier_id).all()
-    if len(old_items):
-        return json.dumps('Wrong')
+@mod.route('/purchasing_suppliers_rank/')#供应商信息分页
+def purchasing_suppliers_rank():
+    page = 1
+    countperpage = 4
+    limit = 1000000
+    if request.args.get('page'):
+        page = int(request.args.get('page'))
+    if request.args.get('countperpage'):
+        countperpage = int(request.args.get('countperpage'))
+    if request.args.get('limit'):
+        limit = int(request.args.get('limit'))
+    if page == 1:
+        startoffset = 0
     else:
-        new_item = supplier_available_product(supplier_id, product_id, purchase_price)
-        db.session.add(new_item)
-        db.session.commit()
-        return json.dumps('Right')
+        startoffset = (page - 1) * countperpage
+    endoffset = startoffset + countperpage
+    newwords = db.session.query(supplier_basic_info).filter().all()
+    news=[]
+    n = 0
+    for newword in newwords:
+        if newword:
+            n = n + 1
+            if n > startoffset:
+                if n > endoffset:
+                    break
+
+                supplier_product_list = ""
+
+                products_ids = db.session.query(supplier_available_product).filter(supplier_available_product.supplier_id == newword.supplier_id).all()
+                for a_product in products_ids:
+                    products_names = db.session.query(product_basic_info).filter(product_basic_info.product_id == a_product.product_id).all()                    
+                    for a_product_item in products_names:
+                        if supplier_product_list == "":
+                            supplier_product_list = supplier_product_list + a_product_item.product_name
+                        else:
+                            supplier_product_list = supplier_product_list+ "; " + a_product_item.product_name
+
+                news.append({'supplier_id':newword.supplier_id,'supplier_name':newword.supplier_name.encode('utf-8'),'supplier_address':newword.supplier_address.encode('utf-8'),'supplier_phone':newword.supplier_phone.encode('utf-8'),'supplier_email':newword.supplier_email,"supplier_product_list":supplier_product_list})
+    total_pages = limit / countperpage + 1
+    return json.dumps({'news': news, 'pages': total_pages})
+
+
+
+@mod.route('/purchasing_supplier_products/')#点击创建订单按钮后跳转到供应商供货明细
+def purchasing_supplier_products():
+    return render_template('admin/purchasing_supplier_products_detail.html')
+
+'''
+@mod.route('/supply_detail_rank/')#某一供应商供货明细展示
+def supply_detail_rank():
+    page = 1
+    countperpage = 10
+    limit = 1000000
+    supplier_id_thisPage = 1
+
+    if request.args.get('page'):
+        page = int(request.args.get('page'))
+    if request.args.get('countperpage'):
+        countperpage = int(request.args.get('countperpage'))
+    if request.args.get('limit'):
+        limit = int(request.args.get('limit'))
+    if request.args.get('supplier_id'):
+        supplier_id_thisPage = int(request.args.get('supplier_id'))
+    #print supplier_id_thisPage
+    if page == 1:
+        startoffset = 0
+    else:
+        startoffset = (page - 1) * countperpage
+    endoffset = startoffset + countperpage
+    newwords = db.session.query(supplier_available_product).filter(supplier_available_product.supplier_id == supplier_id_thisPage).all()
+    news=[]
+    n = 0
+    for newword in newwords:
+        if newword:
+            n = n + 1
+            if n > startoffset:
+                if n > endoffset:
+                    break
+
+                news.append({'supplier_id':newword.supplier_id,'product_id':newword.product_id,'purchase_price':newword.purchase_price})
+    total_pages = limit / countperpage + 1
+    return json.dumps({'news': news, 'pages': total_pages})
+'''
+
+#here2
 
 
 
