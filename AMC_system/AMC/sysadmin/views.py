@@ -30,7 +30,7 @@ def ts2datetime(ts):
 
 
 @mod.route('/')
-@mod.route('/login', methods=['GET','POST'])
+@mod.route('/login/', methods=['GET','POST'])
 def index():
     #return render_template('admin/index.html')
     result = None
@@ -759,7 +759,7 @@ def customer_order_history_rank():
 
 
 ##==========================================仓库管理==============================================================
-###发货管理####
+###================发货管理======================####
 @mod.route('/noDeliver_orders_rank/')#未发货订单信息分页
 def noDeliver_orders_rank():
     page = 1
@@ -877,14 +877,14 @@ def deliver_confirm():
 
 
     ###修改sale_order_summary订单状态的几种情况
-    old_items = db.session.query(sale_order_detail).filter(sale_order_summary.sale_order_number==sale_order_number).all()
+    old_items = db.session.query(sale_order_detail).filter(sale_order_detail.sale_order_number==sale_order_number).all()
     if len(old_items):
         sale_item_status_list = []
         for old_item in old_items:
             sale_item_status_list.append(old_item.sale_item_status)
 
-    #订单条目的几种状态：未提交、已提交、已发货、已收货
-    #订单的几种状态：未提交、已提交、部分发货、已发货、已收货、已付款       
+    #订单条目的几种状态：未提交、已提交、已收货
+    #订单的几种状态：未提交、已提交、部分发货、已发货、已付款       
     if "已提交".decode('utf-8') in sale_item_status_list:
         new_status = "部分发货"
     else:
@@ -901,8 +901,8 @@ def deliver_confirm():
             sale_order_create_time = old_item.sale_order_create_time
             sale_order_submit_time = old_item.sale_order_submit_time
             sale_order_receive_time = old_item.sale_order_receive_time
-            sale_order_pay_time = old_item.sale_order_pay_time
-            pay_remind_time = old_item.pay_remind_time
+            purchase_order_pay_time = old_item.sale_order_pay_time
+            sale_order_pay_time = old_item.pay_remind_time
 
             db.session.delete(old_item)
             db.session.commit()
@@ -946,7 +946,7 @@ def deliver_confirm():
         print "fff",right_flag
 
 
-    ###发货后修改 stock_summary 库存表中对应产品的库存量信息
+    ###发货后 不用 修改 stock_summary 库存表中对应产品的库存量信息！！ 已经在提交订单时修改了库存量信息
     old_items = db.session.query(stock_summary).filter(stock_summary.product_id==product_id).all()
     if len(old_items):
         for old_item in old_items:
@@ -1012,3 +1012,336 @@ def delivery_statistics_rank():
                 news.append({'sale_order_number':newword.sale_order_number,'sale_order_item_number':newword.sale_order_item_number,'product_id':newword.product_id,'delivery_quantity':newword.delivery_quantity,'customer_id':newword.customer_id,'customer_address':newword.customer_address.encode('utf-8'),'deliver_time':newword.deliver_time,'delivery_operator':newword.delivery_operator.encode('utf-8'),'delivery_remarks':newword.delivery_remarks.encode('utf-8')})
     total_pages = limit / countperpage + 1
     return json.dumps({'news': news, 'pages': total_pages},cls=ComplexEncoder)
+
+
+
+###================收货管理======================####
+@mod.route('/noReceiving_orders_rank/')#未收货订单信息分页
+def noReceiving_orders_rank():
+    page = 1
+    countperpage = 4
+    limit = 1000000
+    if request.args.get('page'):
+        page = int(request.args.get('page'))
+    if request.args.get('countperpage'):
+        countperpage = int(request.args.get('countperpage'))
+    if request.args.get('limit'):
+        limit = int(request.args.get('limit'))
+    if page == 1:
+        startoffset = 0
+    else:
+        startoffset = (page - 1) * countperpage
+    endoffset = startoffset + countperpage
+    newwords = db.session.query(purchase_order_summary).filter().all()
+
+    news=[]
+    n = 0
+    for newword in newwords:
+        if newword:
+            n = n + 1
+            if n > startoffset:
+                if n > endoffset:
+                    break
+
+                if newword.purchase_order_status in ("已提交".decode('utf-8'),"部分收货".decode('utf-8')):
+                    news.append({'purchase_order_number':newword.purchase_order_number,'supplier_id':newword.supplier_id,'purchase_order_total_price':newword.purchase_order_total_price,'purchase_order_status':newword.purchase_order_status.encode('utf-8'),'purchase_order_create_time':newword.purchase_order_create_time})
+    total_pages = limit / countperpage + 1
+    return json.dumps({'news': news, 'pages': total_pages},cls=ComplexEncoder)
+
+
+@mod.route('/noReceiving_order_detail/')#查看未收货订单详情
+def noReceiving_order_detail():
+    return render_template('admin/noReceiving_order_detail_page.html')
+
+
+@mod.route('/noReceiving_order_detail_rank/')#某一未收货订单详情展示
+def noReceiving_order_detail_rank():
+    page = 1
+    countperpage = 4
+    limit = 1000000
+    purchase_order_number_thisPage = 1
+
+    if request.args.get('page'):
+        page = int(request.args.get('page'))
+    if request.args.get('countperpage'):
+        countperpage = int(request.args.get('countperpage'))
+    if request.args.get('limit'):
+        limit = int(request.args.get('limit'))
+    if request.args.get('purchase_order_number'):
+        purchase_order_number_thisPage = int(request.args.get('purchase_order_number'))
+    #print purchase_order_number_thisPage
+    if page == 1:
+        startoffset = 0
+    else:
+        startoffset = (page - 1) * countperpage
+    endoffset = startoffset + countperpage
+    newwords = db.session.query(purchase_order_detail).filter(purchase_order_detail.purchase_order_number == purchase_order_number_thisPage).all()
+    news=[]
+    n = 0
+    for newword in newwords:
+        if newword:
+            n = n + 1
+            if n > startoffset:
+                if n > endoffset:
+                    break
+
+                news.append({'purchase_order_number':newword.purchase_order_number,'purchase_order_item_number':newword.purchase_order_item_number,'product_id':newword.product_id,'purchase_amount':newword.purchase_amount,'purchase_price':newword.purchase_price,'total_price_this_item':newword.total_price_this_item,'purchase_item_status':newword.purchase_item_status.encode('utf-8')})
+    total_pages = limit / countperpage + 1
+    return json.dumps({'news': news, 'pages': total_pages})
+
+
+
+##收货管理 / 待收货订单详情  收货确认按钮
+@mod.route('/receiving_confirm/') ##收货确认
+def receiving_confirm():
+    if request.args.get('purchase_order_number'):
+        purchase_order_number = int(request.args.get('purchase_order_number'))
+    if request.args.get('purchase_order_item_number'):
+        purchase_order_item_number = int(request.args.get('purchase_order_item_number')) 
+    if request.args.get('receiving_operator'):
+        receiving_operator = (request.args.get('receiving_operator'))
+
+    right_flag = 0 ##标志位
+
+    ###修改 purchase_order_detail 表对应条目的订单状态，并根据 purchase_order_summary 表中这一订单所有条目的状态判断是否需要修改这一订单的状态   
+    old_items = db.session.query(purchase_order_detail).filter(purchase_order_detail.purchase_order_number==purchase_order_number,purchase_order_detail.purchase_order_item_number==purchase_order_item_number).all()
+    if len(old_items):
+        for old_item in old_items:
+            purchase_order_number = old_item.purchase_order_number
+            purchase_order_item_number = old_item.purchase_order_item_number
+            product_id = old_item.product_id
+            purchase_amount = old_item.purchase_amount
+            purchase_price = old_item.purchase_price
+            total_price_this_item = old_item.total_price_this_item
+            purchase_item_status = "已收货"
+
+            db.session.delete(old_item)
+            db.session.commit()
+            
+        new_item = purchase_order_detail(purchase_order_number,purchase_order_item_number, product_id, purchase_amount,purchase_price,total_price_this_item,purchase_item_status)
+        db.session.add(new_item)
+        db.session.commit()
+
+        #return json.dumps('Right')
+        right_flag = 1
+        print "aaa2",right_flag
+    else:        
+        #return json.dumps('Wrong')
+        right_flag = 0
+        print "bbb2",right_flag
+
+
+    ###修改purchase_order_summary订单状态的几种情况
+    old_items = db.session.query(purchase_order_detail).filter(purchase_order_detail.purchase_order_number==purchase_order_number).all()
+    if len(old_items):
+        purchase_item_status_list = []
+        for old_item in old_items:
+            purchase_item_status_list.append(old_item.purchase_item_status)
+
+    #采购订单条目的几种状态：已提交、已收货
+    #采购订单的几种状态：已提交、部分收货、已收货、已付款      
+    if "已提交".decode('utf-8') in purchase_item_status_list:
+        new_status = "部分收货"
+    else:
+        new_status = "已收货"    
+
+    old_items = db.session.query(purchase_order_summary).filter(purchase_order_summary.purchase_order_number==purchase_order_number).all()
+    if len(old_items):
+        for old_item in old_items:
+            purchase_order_number = old_item.purchase_order_number
+            supplier_id = old_item.supplier_id
+            purchase_order_total_item_num = old_item.purchase_order_total_item_num
+            purchase_order_total_price = old_item.purchase_order_total_price
+            purchase_order_status = new_status
+            purchase_order_create_time = old_item.purchase_order_create_time
+            purchase_order_submit_time = old_item.purchase_order_submit_time
+            purchase_order_receive_time = old_item.purchase_order_receive_time
+            purchase_order_pay_time = old_item.purchase_order_pay_time
+
+            db.session.delete(old_item)
+            db.session.commit()
+
+        new_item = purchase_order_summary(purchase_order_number,supplier_id, purchase_order_total_item_num, purchase_order_total_price,new_status,purchase_order_create_time,purchase_order_submit_time,purchase_order_receive_time,purchase_order_pay_time)
+        db.session.add(new_item)
+        db.session.commit()
+
+        #return json.dumps('Right')
+        right_flag = 1
+        print "ccc2",right_flag
+    else:        
+        #return json.dumps('Wrong')
+        right_flag = 0
+        print "ddd2",right_flag
+
+
+    ###收货后向 receiving_statistics 收货统计表中添加信息
+    receipt_quantity = purchase_amount
+    receipt_time = datetime.now()
+
+    ##收货备注，暂且不写
+    receipt_remarks = ""
+
+    old_items = db.session.query(receiving_statistics).filter(receiving_statistics.purchase_order_number==purchase_order_number,receiving_statistics.purchase_order_item_number==purchase_order_item_number).all()
+    if len(old_items):
+        #return json.dumps('Wrong')
+        right_flag = 0
+        print "eee2",right_flag
+    else:
+        new_item = receiving_statistics(purchase_order_number,purchase_order_item_number,product_id,receipt_quantity,supplier_id,receipt_time,receiving_operator, receipt_remarks)
+        db.session.add(new_item)
+        db.session.commit()
+       #return json.dumps('Right')
+        right_flag = 1
+        print "fff2",right_flag
+
+
+    ###收货后 修改 stock_summary 库存表中对应产品的库存量信息！！ 
+    old_items = db.session.query(stock_summary).filter(stock_summary.product_id==product_id).all()
+    if len(old_items):
+        for old_item in old_items:
+            product_id = old_item.product_id
+
+            inventory_quantity = old_item.inventory_quantity + purchase_amount
+
+            reorder_point = old_item.reorder_point
+            order_volume_automatic = old_item.order_volume_automatic
+           
+            db.session.delete(old_item)
+            db.session.commit()
+
+        new_item = stock_summary(product_id,inventory_quantity,reorder_point,order_volume_automatic)
+        db.session.add(new_item)
+        db.session.commit()
+
+        #return json.dumps('Right')
+        right_flag = 1
+        print "ggg2",right_flag
+    else:        
+        #return json.dumps('Wrong')
+        print "stock_summary 未能正确修改，请检查库存表中是否有对应产品信息"
+        right_flag = 0
+        print "hhh2",right_flag
+
+    if right_flag == 1:
+        return json.dumps('Right')
+    else:
+        return json.dumps('Wrong')
+
+
+###收货记录列表####
+@mod.route('/receiving_statistics_rank/')#收货信息分页
+def receiving_statistics_rank():
+    page = 1
+    countperpage = 4
+    limit = 1000000
+    if request.args.get('page'):
+        page = int(request.args.get('page'))
+    if request.args.get('countperpage'):
+        countperpage = int(request.args.get('countperpage'))
+    if request.args.get('limit'):
+        limit = int(request.args.get('limit'))
+    if page == 1:
+        startoffset = 0
+    else:
+        startoffset = (page - 1) * countperpage
+    endoffset = startoffset + countperpage
+    newwords = db.session.query(receiving_statistics).filter().all()
+    news=[]
+    n = 0
+    for newword in newwords:
+        if newword:
+            n = n + 1
+            if n > startoffset:
+                if n > endoffset:
+                    break
+
+                news.append({'purchase_order_number':newword.purchase_order_number,'purchase_order_item_number':newword.purchase_order_item_number,'product_id':newword.product_id,'receipt_quantity':newword.receipt_quantity,'supplier_id':newword.supplier_id,'receipt_time':newword.receipt_time,'receipt_operator':newword.receipt_operator.encode('utf-8'),'receipt_remarks':newword.receipt_remarks.encode('utf-8')})
+    total_pages = limit / countperpage + 1
+    return json.dumps({'news': news, 'pages': total_pages},cls=ComplexEncoder)
+
+
+
+
+###================库存管理======================####
+@mod.route('/stock_rank/')#库存信息分页
+def stock_rank():
+    page = 1
+    countperpage = 10
+    limit = 1000000
+    if request.args.get('page'):
+        page = int(request.args.get('page'))
+    if request.args.get('countperpage'):
+        countperpage = int(request.args.get('countperpage'))
+    if request.args.get('limit'):
+        limit = int(request.args.get('limit'))
+    if page == 1:
+        startoffset = 0
+    else:
+        startoffset = (page - 1) * countperpage
+    endoffset = startoffset + countperpage
+
+    newwords = db.session.query(stock_summary).filter().all()
+    news=[]
+    n = 0
+    for newword in newwords:
+        if newword:
+            n = n + 1
+            if n > startoffset:
+                if n > endoffset:
+                    break
+
+                product_words = db.session.query(product_basic_info).filter(product_basic_info.product_id == newword.product_id).all()
+                for product_word in product_words:
+                    product_name = product_word.product_name
+
+                news.append({'product_id':newword.product_id,'product_name':product_name.encode('utf-8'),'inventory_quantity':newword.inventory_quantity,'reorder_point':newword.reorder_point,'order_volume_automatic':newword.order_volume_automatic})
+    total_pages = limit / countperpage + 1
+    print news
+    return json.dumps({'news': news, 'pages': total_pages},cls=ComplexEncoder)
+
+
+@mod.route('/reorder_point_mo', methods=['GET','POST'])#修改客户联系方式
+def reorder_point_mo():
+    product_id = int(request.form['id'])
+    reorder_point = str(request.form['reorder_point'])
+    print product_id,reorder_point
+    
+    old_items = db.session.query(stock_summary).filter(stock_summary.product_id==product_id).all()
+    if len(old_items):
+        for old_item in old_items:
+            product_id = old_item.product_id
+            inventory_quantity = old_item.inventory_quantity          
+            order_volume_automatic = old_item.order_volume_automatic
+          
+            db.session.delete(old_item)
+            db.session.commit()
+
+        new_item = stock_summary(product_id, inventory_quantity, reorder_point, order_volume_automatic)
+        db.session.add(new_item)
+        db.session.commit()
+        return json.dumps('Right')
+    else:        
+        return json.dumps('Wrong')
+
+
+@mod.route('/order_volume_automatic_mo', methods=['GET','POST'])#修改客户地址
+def order_volume_automatic_mo():
+    product_id = int(request.form['id'])
+    order_volume_automatic = request.form['order_volume_automatic']
+    
+    old_items = db.session.query(stock_summary).filter(stock_summary.product_id==product_id).all()
+    if len(old_items):
+        for old_item in old_items:
+            product_id = old_item.product_id
+            inventory_quantity = old_item.inventory_quantity          
+            reorder_point = old_item.reorder_point
+
+            db.session.delete(old_item)
+            db.session.commit()
+            
+        new_item = stock_summary(product_id, inventory_quantity, reorder_point, order_volume_automatic)
+        db.session.add(new_item)
+        db.session.commit()
+        return json.dumps('Right')
+    else:        
+        return json.dumps('Wrong')

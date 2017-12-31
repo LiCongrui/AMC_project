@@ -60,7 +60,7 @@
 
 	    $.ajax({   
 	              type:"POST",  
-	              url:"/sysadmin/login",
+	              url:"/sysadmin/login/",
 	              dataType: "json",
 	              async:false,
 	              data:{
@@ -71,7 +71,7 @@
 	              		console.log(data);
 	 
 	                      if(data=='Right') {
-	                      			window.open("index")
+	                      			window.open("/sysadmin/index/")
 	                              } 
 	                      else{
 	                          if (data=='Wrong_pass') {
