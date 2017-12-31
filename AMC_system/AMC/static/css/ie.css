@@ -1,0 +1,27 @@
+
+/* Enabling some CSS3 for IE */
+.imgshadow, .full_caption .caption_text, .overlay, .img_caption, ul.sb_dropdown, .dropdown_1column, .dropdown_2columns, .dropdown_3columns, .dropdown_4columns, .dropdown_5columns, #menu li .align_right, #menu li .black_box, #menu li a{behavior: url(js/PIE.htc);}
+
+/* Opacity for IE */
+.full_caption .caption_text{filter:progid:DXImageTransform.Microsoft.Alpha(opacity=80);}
+.full_caption .caption_text p{filter:progid:DXImageTransform.Microsoft.Alpha(opacity=80);}
+.overlay{filter:progid:DXImageTransform.Microsoft.Alpha(opacity=50);}
+.img_caption{filter:progid:DXImageTransform.Microsoft.Alpha(opacity=60);}
+
+/* IE8 Fixes */
+.rotator_controls {margin:0px 0\9;}
+.rotator_controls li.control {margin:-1px 0\9;}
+.rotator_controls li.active{margin:-1px 0\9;}
+ul.sb_dropdown li input[type="checkbox"]{margin:6px 4px 0 5px\9; border:none\9; background:none\9;}
+
+/* IE7 Fixes */
+*.rotator_controls {margin:1px 0;height:77px;}
+*.rotator_controls li.control {margin:-2px 0;}
+*.rotator_controls li.active{margin:-2px 0;}
+*#ui_element {position:relative; z-index:2;}
+
+/* 
+To target IE7 only, use the "*" sign before the class
+To target IE8 (and below), add "\9" at the end of the properties
+To target IE6 only (not supported here), use "_" before the class name
+*/
