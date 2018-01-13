@@ -66,7 +66,7 @@ def show_index():
 
 @mod.route('/order/')
 def show_order():
-    session['logged_in']
+    #print session['logged_in']
     if 'logged_in' in session and session['logged_in']:
         return render_template('admin/order.html') 
     else:
@@ -213,6 +213,34 @@ def order_detail_rank():
     return json.dumps({'news': news, 'pages': total_pages})
 
 
+@mod.route('/confirm_pay_sale/')#某销售订单确认收款
+def confirm_pay_sale():
+    #print "confirm pay here"
+    if request.args.get('id'):
+        sale_order_number_thisPage = int(request.args.get('id'))
+    #print sale_order_number_thisPage
+
+    old_items = db.session.query(sale_order_summary).filter(sale_order_summary.sale_order_number==sale_order_number_thisPage).all()
+    if len(old_items):
+        for old_item in old_items:
+            sale_order_number = old_item.sale_order_number
+            customer_id = old_item.customer_id
+            sale_order_total_item_num = old_item.sale_order_total_item_num
+            sale_order_total_price = old_item.sale_order_total_price
+            sale_order_status = "已付款"
+            sale_order_create_time = old_item.sale_order_create_time
+            sale_order_submit_time = old_item.sale_order_submit_time
+            sale_order_receive_time = old_item.sale_order_receive_time
+            sale_order_pay_time = datetime.now()
+            pay_remind_time = old_item.pay_remind_time
+
+            db.session.delete(old_item)
+            db.session.commit()
+        new_item = sale_order_summary(sale_order_number, customer_id, sale_order_total_item_num, sale_order_total_price, sale_order_status, sale_order_create_time,sale_order_submit_time,sale_order_receive_time,sale_order_pay_time,pay_remind_time)
+        db.session.add(new_item)
+        db.session.commit()
+
+    return render_template('admin/order.html')
 
 
 #=================================产品管理 products.html =========================================
@@ -355,6 +383,15 @@ def suppliers_de():
             db.session.commit()
     else:
         result = 'Wrong'
+
+    old_items = db.session.query(supplier_available_product).filter(supplier_available_product.supplier_id==supplier_id).all()
+    if len(old_items):
+        for old_item in old_items:
+            db.session.delete(old_item)
+            db.session.commit()
+    else:
+        result = 'Wrong'
+
     return json.dumps(result)
 
 
@@ -671,6 +708,33 @@ def purchasing_detail_rank():
     return json.dumps({'news': news, 'pages': total_pages})
 
 
+@mod.route('/confirm_pay_purchasing/')#某采购订单确认付款
+def confirm_pay_purchasing():
+    #print "confirm pay here"
+    if request.args.get('id'):
+        purchase_order_number_thisPage = int(request.args.get('id'))
+    #print sale_order_number_thisPage
+
+    old_items = db.session.query(purchase_order_summary).filter(purchase_order_summary.purchase_order_number==purchase_order_number_thisPage).all()
+    if len(old_items):
+        for old_item in old_items:
+            purchase_order_number = old_item.purchase_order_number
+            supplier_id = old_item.supplier_id
+            purchase_order_total_item_num = old_item.purchase_order_total_item_num
+            purchase_order_total_price = old_item.purchase_order_total_price
+            purchase_order_status = "已付款"
+            purchase_order_create_time = old_item.purchase_order_create_time
+            purchase_order_submit_time = old_item.purchase_order_submit_time
+            purchase_order_receive_time = old_item.purchase_order_receive_time
+            purchase_order_pay_time = datetime.now()
+
+            db.session.delete(old_item)
+            db.session.commit()
+        new_item = purchase_order_summary(purchase_order_number, supplier_id, purchase_order_total_item_num, purchase_order_total_price, purchase_order_status, purchase_order_create_time,purchase_order_submit_time,purchase_order_receive_time,purchase_order_pay_time)
+        db.session.add(new_item)
+        db.session.commit()
+
+    return render_template('admin/purchasing.html')
 
 
 #=================================客户管理 customer.html==========================================
@@ -925,6 +989,7 @@ def deliver_confirm():
 
     right_flag = 0 ##标志位
 
+
     ###修改 sale_order_detail 表对应条目的订单状态，并根据 sale_order_summary 表中这一订单所有条目的状态判断是否需要修改这一订单的状态   
     old_items = db.session.query(sale_order_detail).filter(sale_order_detail.sale_order_number==sale_order_number,sale_order_detail.sale_order_item_number==sale_order_item_number).all()
     if len(old_items):
@@ -977,14 +1042,14 @@ def deliver_confirm():
             sale_order_status = new_status
             sale_order_create_time = old_item.sale_order_create_time
             sale_order_submit_time = old_item.sale_order_submit_time
-            sale_order_receive_time = old_item.sale_order_receive_time
-            purchase_order_pay_time = old_item.sale_order_pay_time
-            sale_order_pay_time = old_item.pay_remind_time
+            sale_order_receive_time = date.now()
+            sale_order_pay_time = old_item.sale_order_pay_time
+            pay_remind_time = old_item.pay_remind_time
 
             db.session.delete(old_item)
             db.session.commit()
 
-        new_item = sale_order_summary(sale_order_number,customer_id, sale_order_total_item_num, sale_order_total_price,new_status,sale_order_create_time,sale_order_submit_time,sale_order_receive_time,sale_order_pay_time,pay_remind_time)
+        new_item = sale_order_summary(sale_order_number,customer_id, sale_order_total_item_num, sale_order_total_price,sale_order_status,sale_order_create_time,sale_order_submit_time,sale_order_receive_time,sale_order_pay_time,pay_remind_time)
         db.session.add(new_item)
         db.session.commit()
 
@@ -1424,8 +1489,17 @@ def order_volume_automatic_mo():
         return json.dumps('Wrong')
 
 
+
+def nwefunc():
+    print hello
+
 ##################
 
 #########new try
 
 #########try 22222
+
+
+
+def afun():
+    print "ggggggggg"

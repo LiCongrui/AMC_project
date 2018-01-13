@@ -62,10 +62,9 @@ ul{
           
               },
               success: function(data){
- 
                       if(data=='Right') {
                           alert("添加成功!");
-                          window.open("/sysadmin/supplier_products/");
+                          window.open("/sysadmin/supplier_products/?id="+supplier_id);
                       } 
                       else {
                         alert("该产品已存在!");
