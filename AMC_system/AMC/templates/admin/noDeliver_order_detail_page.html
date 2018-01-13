@@ -290,8 +290,18 @@ function GetQueryString(name)
 		                                html += "<td style='text-align:center'>" + user['sale_price'] + "</td>";
 		                                html += "<td style='text-align:center'>" + user['total_price_this_item'] + "</td>";
 		                               html += "<td style='text-align:center'>" + user['sale_item_status'] + "</td>";
-		                               // 模态框btn
+
+		                               if (user['sale_item_status'] == "已发货")
+		                               {
+		                               	// 模态框btn
+		                               html += "<td  style='text-align:center'><button id='deliver_order_"+i+"' type='button' disabled = 'true' data-toggle='modal' data-target='#fahuoModal_"+i+"' style = 'background:#A4A4A4'>"+"确认发货"+"</button></td></tr>";
+		                               }
+		                               else
+		                               {
+		                               	// 模态框btn
 		                               html += "<td  style='text-align:center'><button id='deliver_order_"+i+"' type='button' data-toggle='modal' data-target='#fahuoModal_"+i+"' style = 'background:#81DAF5'>"+"确认发货"+"</button></td></tr>";
+		                               }
+
 		                               //模态框 内容
 		                               modal_content = '\
 		                               <div class="modal fade" id="fahuoModal_'+i+'" tabindex="-1" role="dialog" aria-labelledby="myModalLabel_'+i+'" aria-hidden="true">\

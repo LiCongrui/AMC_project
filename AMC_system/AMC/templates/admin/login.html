@@ -62,7 +62,7 @@
 	              type:"POST",  
 	              url:"/sysadmin/login/",
 	              dataType: "json",
-	              async:false,
+	              async:true,
 	              data:{
 	                para : para,
 	                user : user
@@ -72,8 +72,8 @@
 	 
 	                      if(data=='Right') {
 	                      	        console.log("data right")
-	                      			window.open("/sysadmin/products/")
-	                      			// window.location.href="/sysadmin/products/"
+	                      			// window.open("/sysadmin/index/")
+	                      			window.location.href="/sysadmin/index/";
 	                              } 
 	                      else{
 	                          if (data=='Wrong_pass') {

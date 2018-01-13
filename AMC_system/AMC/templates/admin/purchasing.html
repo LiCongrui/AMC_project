@@ -237,13 +237,32 @@ function declear_re(){<!-- 反选 -->
 		                                html += "<td style='text-align:center'>" + user['purchase_order_status'] + "</td>";
 		                                html += "<td style='text-align:center'>" + user['purchase_order_create_time'] + "</td>";
 		                                html += "<td  style='text-align:center'><button id='order_detail_"+i+"' type='button' style = 'background:#81DAF5'>"+"订单详情"+"</button></td>";
-		                                html += "<td  style='text-align:center'><button id='confirm_pay_"+i+"' type='button' style = 'background:#F2F5A9' >"+"确认付款"+"</button></td>";
+
+		                                if (user['purchase_order_status'] == "已付款")
+		                                {
+		                                	html += "<td  style='text-align:center'><button id='confirm_pay_"+i+"' type='button' disabled = 'true'style = 'background:#A4A4A4' >"+"确认付款"+"</button></td>";
+		                                }
+		                                else
+		                                {
+		                                	html += "<td  style='text-align:center'><button id='confirm_pay_"+i+"' type='button' style = 'background:#F2F5A9' >"+"确认付款"+"</button></td>";
+		                                }
+
 		                                html += "<td style='text-align:center'><input type='checkbox' name='field_f' style='font-size:12pt;'/></td></tr>";
 
 		                                html += "<script>\
 		                                $('#order_detail_"+i+"').click(function() {\
 		                                  window.open('/sysadmin/purchasing_detail/?id="+user['purchase_order_number']+"');\
-		                                });<\/script>"          
+		                                });\
+		                                <\/script>"          
+
+		                                 html += "<script>\
+		                                $('#confirm_pay_"+i+"').click(function() {\
+		                                  var result = confirm('确认付款么');\
+		                                  if (result == true){\
+		                                  window.open('/sysadmin/confirm_pay_purchasing/?id="+user['purchase_order_number']+"');\
+		                                  }\
+		                                });\
+		                                <\/script>" 
 		                            }
 		                            $("#word_table").empty();
 		                            $("#word_table").append(html);
