@@ -157,18 +157,39 @@ def orders_rank():
 
 
 
-@mod.route('/orders_de', methods=['GET','POST'])#删除订单信息
+@mod.route('/orders_de', methods=['GET','POST'])#取消订单信息
 def orders_de():
     result = 'Right'
     sale_order_number = request.form['f_id']
-    print sale_order_number
+    #print sale_order_number
+
     old_items = db.session.query(sale_order_summary).filter(sale_order_summary.sale_order_number==sale_order_number).all()
     if len(old_items):
         for old_item in old_items:
-            db.session.delete(old_item)
-            db.session.commit()
-    else:
-        result = 'Wrong'
+            ##只有订单状态为“已提交”时可以取消订单
+            if old_item.sale_order_status == "已提交".decode('utf-8'):
+                print "yitijiao here"
+                sale_order_number = old_item.sale_order_number
+                customer_id = old_item.customer_id
+                sale_order_total_item_num = old_item.sale_order_total_item_num
+                sale_order_total_price = old_item.sale_order_total_price
+                sale_order_status = "已取消"
+                sale_order_create_time = old_item.sale_order_create_time
+                sale_order_submit_time = old_item.sale_order_submit_time
+                sale_order_deliver_time = old_item.sale_order_deliver_time
+                sale_order_pay_time = old_item.sale_order_pay_time
+                pay_remind_time = old_item.pay_remind_time
+
+                db.session.delete(old_item)
+                db.session.commit()
+
+                new_item = sale_order_summary(sale_order_number, customer_id, sale_order_total_item_num, sale_order_total_price, sale_order_status, sale_order_create_time,sale_order_submit_time,sale_order_deliver_time,sale_order_pay_time,pay_remind_time)
+                db.session.add(new_item)
+                db.session.commit()
+
+            else:
+                result = old_item.sale_order_status.encode('utf-8')
+            
     return json.dumps(result)
 
 
@@ -191,7 +212,7 @@ def order_detail_rank():
     if request.args.get('limit'):
         limit = int(request.args.get('limit'))
     if request.args.get('sale_order_number'):
-        sale_order_number_thisPage = int(request.args.get('sale_order_number'))
+        sale_order_number_thisPage = request.args.get('sale_order_number')
     #print sale_order_number_thisPage
     if page == 1:
         startoffset = 0
@@ -230,13 +251,13 @@ def confirm_pay_sale():
             sale_order_status = "已付款"
             sale_order_create_time = old_item.sale_order_create_time
             sale_order_submit_time = old_item.sale_order_submit_time
-            sale_order_receive_time = old_item.sale_order_receive_time
+            sale_order_deliver_time = old_item.sale_order_deliver_time
             sale_order_pay_time = datetime.now()
             pay_remind_time = old_item.pay_remind_time
 
             db.session.delete(old_item)
             db.session.commit()
-        new_item = sale_order_summary(sale_order_number, customer_id, sale_order_total_item_num, sale_order_total_price, sale_order_status, sale_order_create_time,sale_order_submit_time,sale_order_receive_time,sale_order_pay_time,pay_remind_time)
+        new_item = sale_order_summary(sale_order_number, customer_id, sale_order_total_item_num, sale_order_total_price, sale_order_status, sale_order_create_time,sale_order_submit_time,sale_order_deliver_time,sale_order_pay_time,pay_remind_time)
         db.session.add(new_item)
         db.session.commit()
 
@@ -292,7 +313,7 @@ def products_de():
 
 @mod.route('/products_price_mo', methods=['GET','POST'])#修改产品售价
 def products_price_mo():
-    new_id = int(request.form['id'])
+    new_id = request.form['id']
     price = int(request.form['price'])
     print new_id,price
     
@@ -343,7 +364,7 @@ def add_product():
 @mod.route('/suppliers_rank/')#供应商信息分页
 def suppliers_rank():
     page = 1
-    countperpage = 4
+    countperpage = 3
     limit = 1000000
     if request.args.get('page'):
         page = int(request.args.get('page'))
@@ -440,7 +461,7 @@ def supply_detail_rank():
     if request.args.get('limit'):
         limit = int(request.args.get('limit'))
     if request.args.get('supplier_id'):
-        supplier_id_thisPage = int(request.args.get('supplier_id'))
+        supplier_id_thisPage = request.args.get('supplier_id')
     #print supplier_id_thisPage
     if page == 1:
         startoffset = 0
@@ -481,8 +502,8 @@ def suppplied_products_de():
 
 @mod.route('/supplied_products_price_mo', methods=['GET','POST'])#修改供应商对产品的报价
 def supplied_products_price_mo():
-    supplier_id = int(request.form['supplier_id'])
-    product_id = int(request.form['product_id'])
+    supplier_id = request.form['supplier_id']
+    product_id = request.form['product_id']
     price = int(request.form['price'])
   
     old_items = db.session.query(supplier_available_product).filter(supplier_available_product.product_id==product_id,supplier_available_product.supplier_id==supplier_id).all()
@@ -557,19 +578,40 @@ def purchasing_rank():
     return json.dumps({'news': news, 'pages': total_pages},cls=ComplexEncoder)
 
 
-@mod.route('/purchasing_de', methods=['GET','POST'])#删除采购订单
+@mod.route('/purchasing_de', methods=['GET','POST'])#取消采购订单
 def purchasing_de():
     result = 'Right'
     purchase_order_number = request.form['f_id']
-    print purchase_order_number
+    #print purchase_order_number
     old_items = db.session.query(purchase_order_summary).filter(purchase_order_summary.purchase_order_number==purchase_order_number).all()
     if len(old_items):
         for old_item in old_items:
-            db.session.delete(old_item)
-            db.session.commit()
-    else:
-        result = 'Wrong'
+            ##只有订单状态为“已提交”时可以取消订单
+            if old_item.purchase_order_status == "已提交".decode('utf-8'):
+                print "yitijiao here"
+                purchase_order_number = old_item.purchase_order_number
+                supplier_id = old_item.supplier_id
+                purchase_order_total_item_num = old_item.purchase_order_total_item_num
+                purchase_order_total_price = old_item.purchase_order_total_price
+                purchase_order_status = "已取消"
+                purchase_order_create_time = old_item.purchase_order_create_time
+                purchase_order_submit_time = old_item.purchase_order_submit_time
+                purchase_order_receive_time = old_item.purchase_order_receive_time
+                purchase_order_pay_time = old_item.purchase_order_pay_time
+                
+                db.session.delete(old_item)
+                db.session.commit()
+
+                new_item = purchase_order_summary(purchase_order_number, supplier_id, purchase_order_total_item_num, purchase_order_total_price, purchase_order_status, purchase_order_create_time,purchase_order_submit_time,purchase_order_receive_time,purchase_order_pay_time)
+                db.session.add(new_item)
+                db.session.commit()
+
+            else:
+                result = old_item.purchase_order_status.encode('utf-8')
+            
     return json.dumps(result)
+        
+
 
 
 @mod.route('/purchasing_show_supplier/')#增加一条采购订单信息
@@ -686,7 +728,7 @@ def purchasing_detail_rank():
     if request.args.get('limit'):
         limit = int(request.args.get('limit'))
     if request.args.get('purchase_order_number'):
-        purchase_order_number_thisPage = int(request.args.get('purchase_order_number'))
+        purchase_order_number_thisPage = request.args.get('purchase_order_number')
     #print purchase_order_number_thisPage
     if page == 1:
         startoffset = 0
@@ -712,7 +754,7 @@ def purchasing_detail_rank():
 def confirm_pay_purchasing():
     #print "confirm pay here"
     if request.args.get('id'):
-        purchase_order_number_thisPage = int(request.args.get('id'))
+        purchase_order_number_thisPage = request.args.get('id')
     #print sale_order_number_thisPage
 
     old_items = db.session.query(purchase_order_summary).filter(purchase_order_summary.purchase_order_number==purchase_order_number_thisPage).all()
@@ -787,7 +829,7 @@ def customers_de():
 
 @mod.route('/customers_phone_mo', methods=['GET','POST'])#修改客户联系方式
 def customers_phone_mo():
-    new_id = int(request.form['id'])
+    new_id = request.form['id']
     phone = str(request.form['phone'])
     print new_id,phone
     
@@ -810,7 +852,7 @@ def customers_phone_mo():
 
 @mod.route('/customers_address_mo', methods=['GET','POST'])#修改客户地址
 def customers_address_mo():
-    new_id = int(request.form['id'])
+    new_id = request.form['id']
     address = str(request.form['address'].encode('utf-8'))
     print new_id,address
     
@@ -876,7 +918,7 @@ def customer_order_history_rank():
     if request.args.get('limit'):
         limit = int(request.args.get('limit'))
     if request.args.get('customer_id'):
-        customer_id_thisPage = int(request.args.get('customer_id'))
+        customer_id_thisPage = request.args.get('customer_id')
     #print customer_id_thisPage
     if page == 1:
         startoffset = 0
@@ -954,7 +996,7 @@ def noDeliver_order_detail_rank():
     if request.args.get('limit'):
         limit = int(request.args.get('limit'))
     if request.args.get('sale_order_number'):
-        sale_order_number_thisPage = int(request.args.get('sale_order_number'))
+        sale_order_number_thisPage = request.args.get('sale_order_number')
     #print sale_order_number_thisPage
     if page == 1:
         startoffset = 0
@@ -981,9 +1023,9 @@ def noDeliver_order_detail_rank():
 @mod.route('/deliver_confirm/') ##发货确认
 def deliver_confirm():
     if request.args.get('sale_order_number'):
-        sale_order_number = int(request.args.get('sale_order_number'))
+        sale_order_number = request.args.get('sale_order_number')
     if request.args.get('sale_order_item_number'):
-        sale_order_item_number = int(request.args.get('sale_order_item_number')) 
+        sale_order_item_number = request.args.get('sale_order_item_number')
     if request.args.get('delivery_operator'):
         delivery_operator = (request.args.get('delivery_operator'))
 
@@ -1042,14 +1084,14 @@ def deliver_confirm():
             sale_order_status = new_status
             sale_order_create_time = old_item.sale_order_create_time
             sale_order_submit_time = old_item.sale_order_submit_time
-            sale_order_receive_time = date.now()
+            sale_order_deliver_time = date.now()
             sale_order_pay_time = old_item.sale_order_pay_time
             pay_remind_time = old_item.pay_remind_time
 
             db.session.delete(old_item)
             db.session.commit()
 
-        new_item = sale_order_summary(sale_order_number,customer_id, sale_order_total_item_num, sale_order_total_price,sale_order_status,sale_order_create_time,sale_order_submit_time,sale_order_receive_time,sale_order_pay_time,pay_remind_time)
+        new_item = sale_order_summary(sale_order_number,customer_id, sale_order_total_item_num, sale_order_total_price,sale_order_status,sale_order_create_time,sale_order_submit_time,sale_order_deliver_time,sale_order_pay_time,pay_remind_time)
         db.session.add(new_item)
         db.session.commit()
 
@@ -1210,7 +1252,7 @@ def noReceiving_order_detail_rank():
     if request.args.get('limit'):
         limit = int(request.args.get('limit'))
     if request.args.get('purchase_order_number'):
-        purchase_order_number_thisPage = int(request.args.get('purchase_order_number'))
+        purchase_order_number_thisPage = request.args.get('purchase_order_number')
     #print purchase_order_number_thisPage
     if page == 1:
         startoffset = 0
@@ -1237,9 +1279,9 @@ def noReceiving_order_detail_rank():
 @mod.route('/receiving_confirm/') ##收货确认
 def receiving_confirm():
     if request.args.get('purchase_order_number'):
-        purchase_order_number = int(request.args.get('purchase_order_number'))
+        purchase_order_number = request.args.get('purchase_order_number')
     if request.args.get('purchase_order_item_number'):
-        purchase_order_item_number = int(request.args.get('purchase_order_item_number')) 
+        purchase_order_item_number = request.args.get('purchase_order_item_number')
     if request.args.get('receiving_operator'):
         receiving_operator = (request.args.get('receiving_operator'))
 
@@ -1444,7 +1486,7 @@ def stock_rank():
 
 @mod.route('/reorder_point_mo', methods=['GET','POST'])#修改客户联系方式
 def reorder_point_mo():
-    product_id = int(request.form['id'])
+    product_id = request.form['id']
     reorder_point = str(request.form['reorder_point'])
     print product_id,reorder_point
     
@@ -1468,7 +1510,7 @@ def reorder_point_mo():
 
 @mod.route('/order_volume_automatic_mo', methods=['GET','POST'])#修改客户地址
 def order_volume_automatic_mo():
-    product_id = int(request.form['id'])
+    product_id = request.form['id']
     order_volume_automatic = request.form['order_volume_automatic']
     
     old_items = db.session.query(stock_summary).filter(stock_summary.product_id==product_id).all()
