@@ -59,7 +59,6 @@ def login():
 @mod.route('/index/')
 def show_index():
     if 'logged_in' in session and session['logged_in']:
-        print "here index"
         return render_template('admin/index.html') 
     else:
         return redirect('/sysadmin/')
@@ -163,6 +162,7 @@ def orders_de():
     sale_order_number = request.form['f_id']
     #print sale_order_number
 
+    ##从sale_order_summary 表中将对应订单的状态改为已取消
     old_items = db.session.query(sale_order_summary).filter(sale_order_summary.sale_order_number==sale_order_number).all()
     if len(old_items):
         for old_item in old_items:
@@ -189,7 +189,52 @@ def orders_de():
 
             else:
                 result = old_item.sale_order_status.encode('utf-8')
-            
+                return json.dumps(result)
+
+    ##从sale_order_detail 表中将对应订单的状态改为已取消
+    old_items = db.session.query( sale_order_detail).filter( sale_order_detail.sale_order_number==sale_order_number).all()
+    if len(old_items):
+        for old_item in old_items:
+            sale_order_number = old_item.sale_order_number
+            sale_order_item_number = old_item.sale_order_item_number
+            product_id = old_item.product_id
+            sale_amount = old_item.sale_amount
+            sale_price = old_item.sale_price
+            total_price_this_item = old_item.total_price_this_item
+            sale_item_status = "已取消"
+               
+            db.session.delete(old_item)
+            db.session.commit()
+
+            new_item =  sale_order_detail(sale_order_number, sale_order_item_number, product_id, sale_amount, sale_price, total_price_this_item,sale_item_status)
+            db.session.add(new_item)
+            db.session.commit()
+
+            ###收货后 修改 stock_summary 库存表中对应产品的库存量信息！！ 
+            stock_item = db.session.query(stock_summary).filter(stock_summary.product_id==product_id).all()
+            if len(stock_item):
+                for old_item in stock_item:
+                    product_id = old_item.product_id
+
+                    inventory_quantity = old_item.inventory_quantity + sale_amount
+
+                    reorder_point = old_item.reorder_point
+                    order_volume_automatic = old_item.order_volume_automatic
+                   
+                    db.session.delete(old_item)
+                    db.session.commit()
+
+                new_item = stock_summary(product_id,inventory_quantity,reorder_point,order_volume_automatic)
+                db.session.add(new_item)
+                db.session.commit()
+
+                #return json.dumps('Right')
+            else:        
+                result = 'Wrong'
+    else:
+        result = 'Wrong'
+
+          
     return json.dumps(result)
 
 
@@ -397,6 +442,7 @@ def suppliers_de():
     result = 'Right'
     supplier_id = request.form['f_id']
     print supplier_id
+    print "aaaaaaaa"
     old_items = db.session.query(supplier_basic_info).filter(supplier_basic_info.supplier_id==supplier_id).all()
     if len(old_items):
         for old_item in old_items:
@@ -410,8 +456,6 @@ def suppliers_de():
         for old_item in old_items:
             db.session.delete(old_item)
             db.session.commit()
-    else:
-        result = 'Wrong'
 
     return json.dumps(result)
 
@@ -583,12 +627,14 @@ def purchasing_de():
     result = 'Right'
     purchase_order_number = request.form['f_id']
     #print purchase_order_number
+
+    ##从purchase_order_summary表中将对应订单的状态改为已取消
     old_items = db.session.query(purchase_order_summary).filter(purchase_order_summary.purchase_order_number==purchase_order_number).all()
     if len(old_items):
         for old_item in old_items:
             ##只有订单状态为“已提交”时可以取消订单
             if old_item.purchase_order_status == "已提交".decode('utf-8'):
-                print "yitijiao here"
+                print "yitijiao here",purchase_order_number
                 purchase_order_number = old_item.purchase_order_number
                 supplier_id = old_item.supplier_id
                 purchase_order_total_item_num = old_item.purchase_order_total_item_num
@@ -608,8 +654,34 @@ def purchasing_de():
 
             else:
                 result = old_item.purchase_order_status.encode('utf-8')
+                return json.dumps(result)
+
+    ##从purchase_order_detail 表中将对应订单的状态改为已取消
+    old_items = db.session.query( purchase_order_detail).filter( purchase_order_detail.purchase_order_number==purchase_order_number).all()
+    if len(old_items):
+        for old_item in old_items:
+            purchase_order_number = old_item.purchase_order_number
+            purchase_order_item_number = old_item.purchase_order_item_number
+            product_id = old_item.product_id
+            purchase_amount = old_item.purchase_amount
+            purchase_price = old_item.purchase_price
+            total_price_this_item = old_item.total_price_this_item
+            purchase_item_status = "已取消"
+               
+            db.session.delete(old_item)
+            db.session.commit()
+
+            new_item =  purchase_order_detail(purchase_order_number, purchase_order_item_number, product_id, purchase_amount, purchase_price, total_price_this_item,purchase_item_status)
+            db.session.add(new_item)
+            db.session.commit()
+
             
+    else:
+        result = 'Wrong'
+
+          
     return json.dumps(result)
+            
         
 
 
@@ -1084,7 +1156,7 @@ def deliver_confirm():
             sale_order_status = new_status
             sale_order_create_time = old_item.sale_order_create_time
             sale_order_submit_time = old_item.sale_order_submit_time
-            sale_order_deliver_time = date.now()
+            sale_order_deliver_time = datetime.now()
             sale_order_pay_time = old_item.sale_order_pay_time
             pay_remind_time = old_item.pay_remind_time
 
@@ -1131,34 +1203,6 @@ def deliver_confirm():
 
 
     ###发货后 不用 修改 stock_summary 库存表中对应产品的库存量信息！！ 已经在提交订单时修改了库存量信息
-    old_items = db.session.query(stock_summary).filter(stock_summary.product_id==product_id).all()
-    if len(old_items):
-        for old_item in old_items:
-            product_id = old_item.product_id
-
-            inventory_quantity = old_item.inventory_quantity - sale_amount
-            if inventory_quantity < 0:
-                inventory_quantity = 0
-                right_flag = 0
-
-            reorder_point = old_item.reorder_point
-            order_volume_automatic = old_item.order_volume_automatic
-           
-            db.session.delete(old_item)
-            db.session.commit()
-
-        new_item = stock_summary(product_id,inventory_quantity,reorder_point,order_volume_automatic)
-        db.session.add(new_item)
-        db.session.commit()
-
-        #return json.dumps('Right')
-        right_flag = 1
-        print "ggg",right_flag
-    else:        
-        #return json.dumps('Wrong')
-        print "stock_summary 未能正确修改，请检查库存表中是否有对应产品信息"
-        right_flag = 0
-        print "hhh",right_flag
 
     if right_flag == 1:
         return json.dumps('Right')
@@ -1339,7 +1383,7 @@ def receiving_confirm():
             purchase_order_status = new_status
             purchase_order_create_time = old_item.purchase_order_create_time
             purchase_order_submit_time = old_item.purchase_order_submit_time
-            purchase_order_receive_time = old_item.purchase_order_receive_time
+            purchase_order_receive_time = datetime.now()
             purchase_order_pay_time = old_item.purchase_order_pay_time
 
             db.session.delete(old_item)

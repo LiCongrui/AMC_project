@@ -301,15 +301,24 @@ function declear_re(){<!-- 反选 -->
 		               
 		                /*取消客户订单*/
 		                $("#de_order").click(function() {
-		                    n = 0;
-		                    message = "";
-		                    $("[name='field_f']").each(function(){                              
-		                        if(this.checked)
+		                   
+		                    $("[name='field_f']").each(function(){ 
+		                    	if(this.checked)
+		                    	{
+		                    		n = 0;
+		                    		r = 0;
+		                    		message = "";
+
+		                    		var fa = $(this).parent();
+		                    		var ne = $(fa).prev().prev().prev().prev().prev().prev().prev();                   
+		                    		var f_id = $(ne).html();
+		                    		console.log(f_id);
+
+		                    		r=confirm("确定要取消客户订单"+f_id+"么？");
+
+		                        if(r == true)
 		                        {
-		                              var fa = $(this).parent();
-		                              var ne = $(fa).prev().prev().prev().prev().prev().prev().prev();                   
-		                              var f_id = $(ne).html();
-		                              // console.log(f_id);
+		                              
 		                              $.ajax({   
 		                                type:"POST",  
 		                                url:"/sysadmin/orders_de",
@@ -324,18 +333,24 @@ function declear_re(){<!-- 反选 -->
 		                                    	message = data
 		                                    }
 		                                }           
-		                              });
-		                        }   
+		                              }); 
+		                        }
+
+		                            if(n > 0 && r == true){
+		                                alert("客户订单"+f_id+"取消成功！");
+		                              }
+		                        	if(n == 0 && r == true){
+		                        	alert("此订单状态为"+message+",无法取消！");
+		                        	// console.log(message);
+		                        }
+
+		                    	}    
 		                    });
-		                    if(n > 0){
-		                            alert("订单取消成功！");
-		                          }
-		                    if(n == 0){
-		                    	alert("此订单状态为"+message+",无法取消！");
-		                    	// console.log(message);
-		                    }
-		                    location.reload();
-		                          //document.getElementById("tab2").innerHTML=document.getElementById("tab2");
+
+		                    
+		                location.reload();
+		                      //document.getElementById("tab2").innerHTML=document.getElementById("tab2");
+		                    
 		                });
 		               
 
