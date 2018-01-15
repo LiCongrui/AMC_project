@@ -37,6 +37,42 @@
 
 </head>
 
+
+<script>
+function drop_menu(){<!-- 选择下拉菜单 -->
+  var lis = document.getElementById("drop_f");
+  lis.style.display='block';
+}
+
+function declear_all(){<!-- 全选 -->
+  $(document).ready(function(){
+    var divs=$("input[name='field_f']");
+    for(var i = 0;i<divs.length;i++)
+        divs[i].checked = true;
+  })
+  var lis = document.getElementById("drop_f");
+  lis.style.display='none';
+}
+
+function declear_re(){<!-- 反选 -->
+    $("[name='field_f']").each(function(){
+        if(this.checked)
+        {
+            this.checked = false;
+        }
+        else
+        {
+            this.checked = true;
+        }
+   
+    })
+    var lis = document.getElementById("drop_f");
+    lis.style.display='none';
+ 
+}
+</script>
+
+
 <body>
 	<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
 		<div class="container-fluid">
@@ -74,9 +110,9 @@
 			<li><a href="/sysadmin/order/"><span class="glyphicon glyphicon-th"></span> 订单管理</a></li>
 			<li><a href="/sysadmin/products/"><span class="glyphicon glyphicon-stats"></span> 产品管理</a></li>
 			<li><a href="/sysadmin/purchasing/"><span class="glyphicon glyphicon-list-alt"></span> 采购管理</a></li>
-			<li class="active"><a href="/sysadmin/customer/"><span class="glyphicon glyphicon-pencil"></span> 客户管理 </a></li>
+			<li><a href="/sysadmin/customer/"><span class="glyphicon glyphicon-pencil"></span> 客户管理 </a></li>
 			<li class="parent ">
-				<a href="#">
+				<a href="#" class="active">
 					<span class="glyphicon glyphicon-list"></span> 仓库管理 <span data-toggle="collapse" href="#sub-item-1" class="icon pull-right"><em class="glyphicon glyphicon-s glyphicon-plus"></em></span> 
 				</a>
 				<ul class="children collapse" id="sub-item-1">

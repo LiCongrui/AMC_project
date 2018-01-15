@@ -11,12 +11,12 @@ __all__ = ['product_basic_info', 'stock_summary','delivery_statistics', \
 #1.1
 class product_basic_info(db.Model):
     __tablename__ = 'product_basic_info'
-    product_id = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
+    product_id = db.Column(db.String(30), nullable=False, primary_key=True)
     product_name = db.Column(db.String(16), nullable=False, server_default='', unique=True)
     product_format = db.Column(db.String(16), nullable=False, server_default='')
     sale_price = db.Column(db.Float, nullable=False)
     product_image = db.Column(db.LargeBinary(length=2048), nullable=True)
-    product_introduction = db.Column(db.Text, nullable=True)
+    product_introduction = db.Column(db.Text)
 
     def __init__(self, product_id, product_name, product_format, sale_price, product_image, product_introduction):
         self.product_id = product_id
@@ -30,7 +30,7 @@ class product_basic_info(db.Model):
 #1.2
 class stock_summary(db.Model):
     __tablename__ = 'stock_summary'
-    product_id = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
+    product_id = db.Column(db.String(30), nullable=False, primary_key=True)
     inventory_quantity = db.Column(db.Integer, nullable=False)
     reorder_point = db.Column(db.Integer, nullable=False)
     order_volume_automatic = db.Column(db.Integer, nullable=False)
@@ -44,15 +44,15 @@ class stock_summary(db.Model):
 #1.6
 class delivery_statistics(db.Model):
     __tablename__ = 'delivery_statistics'
-    sale_order_number = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
+    sale_order_number = db.Column(db.String(30), nullable=False, primary_key=True)
     sale_order_item_number = db.Column(db.Integer, nullable=False, primary_key=True)
-    product_id = db.Column(db.Integer, nullable=False)
+    product_id = db.Column(db.String(30), nullable=False)
     delivery_quantity = db.Column(db.Integer, nullable=False)
-    customer_id = db.Column(db.Integer, nullable=False)
+    customer_id = db.Column(db.String(30), nullable=False)
     customer_address = db.Column(db.String(30), nullable=False)
     deliver_time = db.Column(db.DateTime, nullable=False)
     delivery_operator = db.Column(db.String(30), nullable=False)
-    delivery_remarks = db.Column(db.String(30), nullable=False)
+    delivery_remarks = db.Column(db.String(30))
 
     def __init__(self, sale_order_number, sale_order_item_number, product_id, delivery_quantity, customer_id, customer_address,deliver_time, delivery_operator,delivery_remarks):
         self.sale_order_number = sale_order_number
@@ -68,14 +68,14 @@ class delivery_statistics(db.Model):
 #1.7
 class receiving_statistics(db.Model):
     __tablename__ = 'receiving_statistics'
-    purchase_order_number = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
+    purchase_order_number = db.Column(db.String(30), nullable=False, primary_key=True)
     purchase_order_item_number = db.Column(db.Integer, nullable=False, primary_key=True)
-    product_id = db.Column(db.Integer, nullable=False)
+    product_id = db.Column(db.String(30), nullable=False)
     receipt_quantity = db.Column(db.Integer, nullable=False)
-    supplier_id = db.Column(db.Integer, nullable=False)
+    supplier_id = db.Column(db.String(30), nullable=False)
     receipt_time = db.Column(db.DateTime, nullable=False)
     receipt_operator = db.Column(db.String(10), nullable=False)
-    receipt_remarks = db.Column(db.String(30), nullable=False)
+    receipt_remarks = db.Column(db.String(30))
 
     def __init__(self, purchase_order_number, purchase_order_item_number, product_id, receipt_quantity, supplier_id, receipt_time,receipt_operator, receipt_remarks):
         self.purchase_order_number = purchase_order_number
@@ -90,7 +90,7 @@ class receiving_statistics(db.Model):
 #2.1 
 class supplier_basic_info(db.Model):
     __tablename__ = 'supplier_basic_info'
-    supplier_id = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
+    supplier_id = db.Column(db.String(30), nullable=False, primary_key=True)
     supplier_name = db.Column(db.String(30), nullable=False)
     supplier_address = db.Column(db.String(50), nullable=False)
     supplier_phone = db.Column(db.String(20), nullable=False)
@@ -108,8 +108,8 @@ class supplier_basic_info(db.Model):
 #2.2
 class supplier_available_product(db.Model):
     __tablename__ = 'supplier_available_product'
-    supplier_id = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
-    product_id = db.Column(db.Integer, nullable=False, primary_key=True)
+    supplier_id = db.Column(db.String(30), nullable=False, primary_key=True)
+    product_id = db.Column(db.String(30), nullable=False, primary_key=True)
     purchase_price = db.Column(db.Float, nullable=False)
 
     def __init__(self, supplier_id, product_id, purchase_price):
@@ -121,7 +121,7 @@ class supplier_available_product(db.Model):
 #3.1 
 class customer_basic_info(db.Model):
     __tablename__ = 'customer_basic_info'
-    customer_id = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
+    customer_id = db.Column(db.String(30), nullable=False, primary_key=True)
     customer_name = db.Column(db.String(30), nullable=False)
     customer_address = db.Column(db.String(50), nullable=False)
     customer_phone = db.Column(db.String(20), nullable=False)
@@ -140,16 +140,16 @@ class customer_basic_info(db.Model):
 #4.1
 class sale_order_summary(db.Model):
     __tablename__ = 'sale_order_summary'
-    sale_order_number = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
-    customer_id = db.Column(db.Integer, nullable=False)
+    sale_order_number = db.Column(db.String(30), nullable=False, primary_key=True)
+    customer_id = db.Column(db.String(30), nullable=False)
     sale_order_total_item_num = db.Column(db.Integer, nullable=False)
     sale_order_total_price = db.Column(db.Float, nullable=False)
     sale_order_status = db.Column(db.String(15), nullable=False)
     sale_order_create_time = db.Column(db.DateTime, nullable=False)
-    sale_order_submit_time = db.Column(db.DateTime, nullable=False)
-    sale_order_receive_time = db.Column(db.DateTime, nullable=False)
-    sale_order_pay_time = db.Column(db.DateTime, nullable=False)
-    pay_remind_time = db.Column(db.Integer, nullable=False)
+    sale_order_submit_time = db.Column(db.DateTime)
+    sale_order_deliver_time = db.Column(db.DateTime)
+    sale_order_pay_time = db.Column(db.DateTime)
+    pay_remind_time = db.Column(db.Integer)
 
     def __init__(self, sale_order_number, customer_id, sale_order_total_item_num, sale_order_total_price, sale_order_status, sale_order_create_time,sale_order_submit_time,sale_order_receive_time,sale_order_pay_time,pay_remind_time):
         self.sale_order_number = sale_order_number
@@ -177,9 +177,9 @@ class sale_order_summary(db.Model):
 #4.2
 class sale_order_detail(db.Model):
     __tablename__ = 'sale_order_detail'
-    sale_order_number = db.Column(db.Integer, nullable=False, primary_key=True)
+    sale_order_number = db.Column(db.String(30), nullable=False, primary_key=True)
     sale_order_item_number = db.Column(db.Integer, nullable=False, primary_key=True)
-    product_id = db.Column(db.Integer, nullable=False)
+    product_id = db.Column(db.String(30), nullable=False)
     sale_amount = db.Column(db.Integer, nullable=False)
     sale_price = db.Column(db.Float, nullable=False)
     total_price_this_item = db.Column(db.Float, nullable=False)
@@ -205,15 +205,15 @@ class sale_order_detail(db.Model):
 #4.3
 class purchase_order_summary(db.Model):
     __tablename__ = 'purchase_order_summary'
-    purchase_order_number = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
-    supplier_id = db.Column(db.Integer, nullable=False)
+    purchase_order_number = db.Column(db.String(30), nullable=False, primary_key=True)
+    supplier_id = db.Column(db.String(30), nullable=False)
     purchase_order_total_item_num = db.Column(db.Integer, nullable=False)
     purchase_order_total_price = db.Column(db.Float, nullable=False)
     purchase_order_status = db.Column(db.String(15), nullable=False)
     purchase_order_create_time = db.Column(db.DateTime, nullable=False)
-    purchase_order_submit_time = db.Column(db.DateTime, nullable=False)
-    purchase_order_receive_time = db.Column(db.DateTime, nullable=False)
-    purchase_order_pay_time = db.Column(db.DateTime, nullable=False)
+    purchase_order_submit_time = db.Column(db.DateTime)
+    purchase_order_receive_time = db.Column(db.DateTime)
+    purchase_order_pay_time = db.Column(db.DateTime)
 
     def __init__(self, purchase_order_number, supplier_id, purchase_order_total_item_num, purchase_order_total_price, purchase_order_status, purchase_order_create_time,purchase_order_submit_time,purchase_order_receive_time,purchase_order_pay_time):
         self.purchase_order_number = purchase_order_number
@@ -239,9 +239,9 @@ class purchase_order_summary(db.Model):
 #4.4
 class purchase_order_detail(db.Model):
     __tablename__ = 'purchase_order_detail'
-    purchase_order_number = db.Column(db.Integer, nullable=False, primary_key=True)
+    purchase_order_number = db.Column(db.String(30), nullable=False, primary_key=True)
     purchase_order_item_number = db.Column(db.Integer, nullable=False, primary_key=True)
-    product_id = db.Column(db.Integer, nullable=False)
+    product_id = db.Column(db.String(30), nullable=False)
     purchase_amount = db.Column(db.Integer, nullable=False)
     purchase_price = db.Column(db.Float, nullable=False)
     total_price_this_item = db.Column(db.Float, nullable=False)
@@ -267,7 +267,7 @@ class purchase_order_detail(db.Model):
 #5.1
 class customer_register_info(db.Model):
     __tablename__ = 'customer_register_info'
-    customer_id = db.Column(db.Integer, nullable=False, primary_key=True)
+    customer_id = db.Column(db.String(30), nullable=False, primary_key=True)
     customer_login_name = db.Column(db.String(30), nullable=False)
     customer_password = db.Column(db.String(30), nullable=False)
     customer_purview = db.Column(db.Integer, nullable=False)
@@ -286,7 +286,7 @@ class customer_register_info(db.Model):
 #5.2
 class sys_user_info(db.Model):
     __tablename__ = 'sys_user_info'
-    user_id = db.Column(db.Integer, nullable=False, primary_key=True)
+    user_id = db.Column(db.String(30), nullable=False, primary_key=True)
     user_login_name = db.Column(db.String(30), nullable=False)
     user_password = db.Column(db.String(30), nullable=False)
     user_purview = db.Column(db.Integer, nullable=False)
@@ -305,7 +305,7 @@ class sys_user_info(db.Model):
 #5.3
 class purview_set(db.Model):
     __tablename__ = 'purview_set'
-    purview_id = db.Column(db.Integer, nullable=False, primary_key=True)
+    purview_id = db.Column(db.String(10), nullable=False, primary_key=True)
     purview_description = db.Column(db.String(30), nullable=False)
 
     def __init__(self, purview_id, purview_description):

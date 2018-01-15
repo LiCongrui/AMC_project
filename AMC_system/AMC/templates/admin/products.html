@@ -190,7 +190,7 @@ function declear_re(){<!-- 反选 -->
                         </div>
                         <button id="mo_new" type="button" class="btn btn-warning">修改售价</button>
                         <button id="add_car" type="button" class="btn btn-success">添加产品</button>
-                        <button id="de_user" type="button" class="btn btn-danger">删除产品</button>
+                        <button id="de_product" type="button" class="btn btn-danger">删除产品</button>
                    </div>
                    <div class="bs-docs-example">
                       <table class="table table-bordered" id="new_table">
@@ -272,16 +272,24 @@ function declear_re(){<!-- 反选 -->
               getRankData_f1(countperpage_args, limit_arg);
             })
                    
-                    /*删除*/
-                    $("#de_user").click(function() {
-                        n = 0;
-                        $("[name='field_f']").each(function(){                              
-                            if(this.checked)
+                    /*删除产品*/
+                    $("#de_product").click(function() {
+                        
+                        $("[name='field_f']").each(function(){  
+                          if(this.checked)
+                          {
+                            n = 0;
+                            r = 0;
+                            var fa = $(this).parent();
+                            var ne = $(fa).prev().prev().prev().prev().prev();                   
+                            var f_id = $(ne).html();
+                            console.log(f_id);
+
+                             r=confirm("确定要删除产品"+f_id+"么？");
+
+                            if(r == true)
                             {
-                                  var fa = $(this).parent();
-                                  var ne = $(fa).prev().prev().prev().prev().prev();                   
-                                  var f_id = $(ne).html();
-                                  console.log(f_id);
+                                 
                                   $.ajax({   
                                     type:"POST",  
                                     url:"/sysadmin/products_de",
@@ -294,14 +302,19 @@ function declear_re(){<!-- 反选 -->
                                         }
                                     }           
                                   });
-                            }   
-                        });
-                        if(n > 0){
-                                alert("删除成功！");
+                            } 
+
+                            if(n > 0 && r == true){
+                                alert("产品"+f_id+"删除成功！");
                               }
+
+                          }
+                        });
+
                         location.reload();
                               //document.getElementById("tab2").innerHTML=document.getElementById("tab2");
                     });
+
                     //修改报价
                     $("#mo_new").click(function() {
                         n = 0;
@@ -422,7 +435,7 @@ function declear_re(){<!-- 反选 -->
                         
                       </div>
                       <script>
-                        var countperpage_args = 4;
+                        var countperpage_args = 3;
                         var limit_arg = 1000000;
 
                         function getRankData_f2(countperpage_args, limit_arg){
@@ -488,14 +501,22 @@ function declear_re(){<!-- 反选 -->
                      
                       /*删除供应商*/
                       $("#de_supplier").click(function() {
-                          n = 0;
-                          $("[name='field_f']").each(function(){                              
-                              if(this.checked)
+                          
+                          $("[name='field_f']").each(function(){
+                            n = 0;
+                            r = 0;
+
+                            var fa = $(this).parent();
+                            var ne = $(fa).prev().prev().prev().prev().prev().prev();                   
+                            var f_id = $(ne).html();
+                            console.log(f_id);
+
+                            if(this.checked)
+                            {
+                              r=confirm("确定要删除供应商"+f_id+"么？");
+
+                               if(r == true)
                               {
-                                    var fa = $(this).parent();
-                                    var ne = $(fa).prev().prev().prev().prev().prev().prev();                   
-                                    var f_id = $(ne).html();
-                                    console.log(f_id);
                                     $.ajax({   
                                       type:"POST",  
                                       url:"/sysadmin/suppliers_de",
@@ -508,11 +529,15 @@ function declear_re(){<!-- 反选 -->
                                           }
                                       }           
                                     });
-                              }   
-                          });
-                          if(n > 0){
-                                  alert("删除成功！");
+                              }  
+
+                               if(n > 0){
+                                  alert("供应商"+f_id+"删除成功！");
                                 }
+                            }
+                             
+                          });
+                          
                           location.reload();
                                 //document.getElementById("tab2").innerHTML=document.getElementById("tab2");
                       });

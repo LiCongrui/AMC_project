@@ -188,7 +188,7 @@ function declear_re(){<!-- 反选 -->
 		                    </div>
 		                    <button id="add_purchasing_order" type="button" class="btn btn-success">添加订单</button>
 		                 
-		                    <button id="de_order" type="button" class="btn btn-danger">删除订单</button>
+		                    <button id="de_order" type="button" class="btn btn-danger">取消订单</button>
 		                    
 		               </div>
 		               <div class="bs-docs-example">
@@ -300,16 +300,26 @@ function declear_re(){<!-- 反选 -->
 		          getRankData_f1(countperpage_args, limit_arg);
 		        })
 		               
-		                /*删除*/
+		                /*取消采购订单*/
 		                $("#de_order").click(function() {
-		                    n = 0;
-		                    $("[name='field_f']").each(function(){                              
-		                        if(this.checked)
-		                        {
-		                              var fa = $(this).parent();
-		                              var ne = $(fa).prev().prev().prev().prev().prev().prev().prev();                   
-		                              var f_id = $(ne).html();
-		                              console.log(f_id);
+		                    
+		                    $("[name='field_f']").each(function(){
+		                    	if(this.checked)
+		                    	{
+		                    		n = 0;
+		                    		r = 0;
+		                   		 	message = "";
+
+		                   		 	var fa = $(this).parent();
+		                   		 	var ne = $(fa).prev().prev().prev().prev().prev().prev().prev();                   
+		                   		 	var f_id = $(ne).html();
+		                   		 	console.log(f_id);
+
+		                    		r=confirm("确定要取消采购订单"+f_id+"么？");
+
+		                    		if(r == true)
+		                        	{
+		                              
 		                              $.ajax({   
 		                                type:"POST",  
 		                                url:"/sysadmin/purchasing_de",
@@ -320,13 +330,25 @@ function declear_re(){<!-- 反选 -->
 		                                    if( data =='Right'){
 		                                      n = n + 1;
 		                                    }
+		                                    else{
+		                                    	message = data
+		                                    }
 		                                }           
 		                              });
-		                        }   
+		                        	}  
+
+		                        	 if(n > 0 && r == true ){
+		                        	         alert("采购订单"+f_id+"取消成功！");
+		                        	       }
+		                        	 if(n == 0 && r == true ){
+		                        	 	alert("此订单状态为"+message+",无法取消！");
+		                        	 	// console.log(message);
+		                        	 }
+
+		                    	}
+		                        
 		                    });
-		                    if(n > 0){
-		                            alert("删除成功！");
-		                          }
+		                   
 		                    location.reload();
 		                          //document.getElementById("tab2").innerHTML=document.getElementById("tab2");
 		                });

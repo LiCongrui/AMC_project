@@ -37,6 +37,40 @@
 
 </head>
 
+<script>
+function drop_menu(){<!-- 选择下拉菜单 -->
+  var lis = document.getElementById("drop_f");
+  lis.style.display='block';
+}
+
+function declear_all(){<!-- 全选 -->
+  $(document).ready(function(){
+    var divs=$("input[name='field_f']");
+    for(var i = 0;i<divs.length;i++)
+        divs[i].checked = true;
+  })
+  var lis = document.getElementById("drop_f");
+  lis.style.display='none';
+}
+
+function declear_re(){<!-- 反选 -->
+    $("[name='field_f']").each(function(){
+        if(this.checked)
+        {
+            this.checked = false;
+        }
+        else
+        {
+            this.checked = true;
+        }
+   
+    })
+    var lis = document.getElementById("drop_f");
+    lis.style.display='none';
+ 
+}
+</script>
+
 <body>
 	<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
 		<div class="container-fluid">
@@ -236,14 +270,21 @@
 						       
 						        /*删除*/
 						        $("#de_user").click(function() {
-						            n = 0;
-						            $("[name='field_f']").each(function(){                              
-						                if(this.checked)
-						                {
-						                      var fa = $(this).parent();
-						                      var ne = $(fa).prev().prev().prev().prev().prev().prev();                   
-						                      var f_id = $(ne).html();
-						                      console.log(f_id);
+						            $("[name='field_f']").each(function(){    
+						            	if(this.checked)
+						            	{
+						            		n = 0;
+						            		r = 0;
+
+						            		var fa = $(this).parent();
+						                    var ne = $(fa).prev().prev().prev().prev().prev().prev();                   
+						                    var f_id = $(ne).html();
+						                    console.log(f_id);
+
+						            		r=confirm("确定要删除客户"+f_id+"么？");
+
+						            		if(r == true)
+						                	{ 
 						                      $.ajax({   
 						                        type:"POST",  
 						                        url:"/sysadmin/customers_de",
@@ -256,14 +297,21 @@
 						                            }
 						                        }           
 						                      });
-						                }   
+						               		}  
+
+						               		if(n > 0){
+						                    alert("客户"+f_id+"删除成功！");
+						                  }  
+						            	}    
+  
 						            });
-						            if(n > 0){
-						                    alert("删除成功！");
-						                  }
+						           
 						            location.reload();
 						                  //document.getElementById("tab2").innerHTML=document.getElementById("tab2");
 						        });
+
+
+						        
 						        //修改联系方式
 						        $("#mo_phone").click(function() {
 						            n = 0;
