@@ -43,6 +43,34 @@ ul{
   
     </style>
 <SCRIPT type="text/javascript">
+// 获得当前时间,并做转换字符串处理
+var today = new Date();
+var dateAndTime = today.toLocaleString().toString();
+
+var fullYear = today.getFullYear().toString();
+var yrar2bit = fullYear.substring(fullYear.length-2,fullYear.length);
+
+var monthStr = '00'+(today.getMonth() + 1).toString();
+var month2bit = monthStr.substring(monthStr.length-2,monthStr.length);
+
+var dateStr = '00'+(today.getDate()).toString();
+var date2bit = dateStr.substring(dateStr.length-2,dateStr.length);
+
+var hourStr = '00'+(today.getHours()).toString();
+var hour2bit = hourStr.substring(hourStr.length-2,hourStr.length);
+
+var minuteStr = '00'+(today.getMinutes()).toString();
+var minute2bit = minuteStr.substring(minuteStr.length-2,minuteStr.length);
+
+var secondStr = '00'+(today.getSeconds()).toString();
+var second2bit = secondStr.substring(secondStr.length-2,secondStr.length);
+
+supplier_id_thisTime = 's'+yrar2bit+month2bit+date2bit+hour2bit+minute2bit+second2bit+'XXX(后三位请输入编号)'
+
+supplier_add_time_this = fullYear+'/'+month2bit+'/'+date2bit+'/'+hour2bit+'/'+minute2bit+'/'+second2bit
+
+console.log(supplier_id_thisTime)
+console.log(supplier_add_time_this)
 
  function savesupplier(){
   var supplier_id=document.getElementById("supplier_id").value;
@@ -100,7 +128,7 @@ ul{
               <tr style="padding-top:20px;">
                 <td width="35%" height="50" style="font-size: 16pt" align="center">供应商代码 </td>
                 <td width="65%"  colspan="2" >
-                 <input type="text"  id="supplier_id" class="logininput" name="usercode"    size="30"  datatype="Require" style="width: 180px; height:19px; border:1px solid #5397be;"  msg="请输入供应商代码"/>
+                 <input type="text"  id="supplier_id" value = "td1" class="logininput" name="usercode"    size="30"  datatype="Require" style="width: 180px; height:19px; border:1px solid #5397be;"  msg="请输入供应商代码"/>
                 </td>
               </tr>
               <tr style="padding-top:20px;">
@@ -130,7 +158,7 @@ ul{
              <tr style="padding-top:20px;">
                 <td width="35%" height="50" style="font-size: 16pt" align="center">添加时间 </td>
                 <td width="65%"  colspan="2" >
-                 <input type="text"  id="supplier_add_time" class="logininput" name="usercode"    size="30"  datatype="Require" style="width: 180px; height:19px; border:1px solid #5397be;"  msg="请输入添加时间"/>
+                 <input type="text"  id="supplier_add_time" value = supplier_add_time_this class="logininput" name="usercode"    size="30"  datatype="Require" style="width: 180px; height:19px; border:1px solid #5397be;"  msg="请输入添加时间"/>
                 </td>
               </tr>
               <tr>
@@ -142,3 +170,27 @@ ul{
           </table>
         </div>
 </body>
+
+<script>
+    !function ($) {
+        $(document).on("click","ul.nav li.parent > a > span.icon", function(){          
+            $(this).find('em:first').toggleClass("glyphicon-minus");      
+        }); 
+        $(".sidebar span.icon").find('em:first').addClass("glyphicon-plus");
+    }(window.jQuery);
+
+    $(window).on('resize', function () {
+      if ($(window).width() > 768) $('#sidebar-collapse').collapse('show')
+    })
+    $(window).on('resize', function () {
+      if ($(window).width() <= 767) $('#sidebar-collapse').collapse('hide')
+    })
+
+    $(function(){
+
+
+      $("#td1").text(" J2EE开发");
+
+   });
+
+  </script> 
