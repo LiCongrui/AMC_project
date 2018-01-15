@@ -393,12 +393,21 @@ def add_product():
     product_image = request.form['product_image']
     product_introduction = request.form['product_introduction']
    
-
+    ##添加产品至product_basic_info表
     old_items = db.session.query(product_basic_info).filter(product_basic_info.product_id==product_id).all()
     if len(old_items):
         return json.dumps('Wrong')
     else:
         new_item = product_basic_info(product_id, product_name,product_format, sale_price, product_image,product_introduction)
+        db.session.add(new_item)
+        db.session.commit()
+
+    ##添加产品至stock_summary表
+    old_items = db.session.query(stock_summary).filter(stock_summary.product_id==product_id).all()
+    if len(old_items):
+        return json.dumps('Wrong2')
+    else:
+        new_item = stock_summary(product_id, 0,0,0)
         db.session.add(new_item)
         db.session.commit()
         return json.dumps('Right')
